@@ -73,7 +73,7 @@ def main(stdscr):
     curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_CYAN)
     curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-    curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_BLUE)
+    curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_GREEN)
 
     k = 0 # input key
     i = 0 # projects index
@@ -88,27 +88,17 @@ def main(stdscr):
             editing = not editing
         elif k == 450:  # up key
             i = i - 1
-            if i < 0:
-                i = len(projects) - 1
+            if i < 0: i = len(projects) - 1
         elif k == 456:  # down key
             i = i + 1
-            
-            if i > len(projects) - 1:
-                i = 0
+            if i > len(projects) - 1: i = 0
             
         
-        
-
         stdscr.clear()
-        draw_menu(stdscr,projects,i)
-
-        # add the text box
-            # editwin = curses.newwin(10, 30, 5, edit_window_x)
-            # editwin.border()
-            # rectangle(stdscr, 4,edit_window_x - 1, 1+10+1 + 4, 1+30+1 + edit_window_x - 1)
-            # stdscr.refresh()
-            # box = Textbox(editwin)
-        # Wait for next input
+        draw_menu(stdscr, projects, i)
+        
+        # draw botton text
+        stdscr.addstr(stdscr.getmaxyx()[0]-1,0,"TPM by Sem van der Hoeven",)
         k = stdscr.getch()
         stdscr.refresh()
 
