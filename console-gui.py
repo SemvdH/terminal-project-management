@@ -8,6 +8,18 @@ RED_BLACK = 2
 MAGENTA_CYAN = 3
 YELLOW_BLACK = 4
 WHITE_BLUE = 5
+CYAN_BLACK = 6
+
+"""
+    COLOR_BLACK
+    COLOR_RED
+    COLOR_GREEN
+    COLOR_YELLOW
+    COLOR_BLUE
+    COLOR_MAGENTA
+    COLOR_CYAN
+    COLOR_WHITE
+    """
 
 class Project:
     def __init__(self, title: str):
@@ -58,26 +70,16 @@ def draw_menu(stdscr, projects: list, idx: int):
 
 def draw_tasks(stdscr):
     h, w = stdscr.getmaxyx()
-    stdscr.vline(0,w//2,curses.ACS_VLINE,h-1,curses.color_pair(RED_BLACK))
+    stdscr.vline(0,w//2,curses.ACS_VLINE,h-1,curses.color_pair(CYAN_BLACK))
 
 def main(stdscr):
-
-    """
-    COLOR_BLACK
-    COLOR_RED
-    COLOR_GREEN
-    COLOR_YELLOW
-    COLOR_BLUE
-    COLOR_MAGENTA
-    COLOR_CYAN
-    COLOR_WHITE
-    """
 
     curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_MAGENTA)
     curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_CYAN)
     curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_GREEN)
+    curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
 
     k = 0 # input key
     i = 0 # projects index
