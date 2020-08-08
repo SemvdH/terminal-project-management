@@ -36,9 +36,7 @@ def get_x_pos_center(text: str):
 def draw_menu(stdscr, projects: list, idx: int):
     menu_width = 20
     # draw line
-    stdscr.attron(curses.color_pair(RED_BLACK))
-    stdscr.vline(0, menu_width, curses.ACS_VLINE, stdscr.getmaxyx()[0] - 1)
-    stdscr.attroff(curses.color_pair(RED_BLACK))
+    stdscr.vline(0, menu_width, curses.ACS_VLINE, stdscr.getmaxyx()[0] - 1, curses.color_pair(RED_BLACK))
 
     # draw project title
     title = "PROJECTS"
