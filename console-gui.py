@@ -11,6 +11,7 @@ WHITE_BLUE = 5
 CYAN_BLACK = 6
 menu_width = 20
 
+
 """
     COLOR_BLACK
     COLOR_RED
@@ -43,10 +44,15 @@ class Status(Enum):
     WORKING = 2
     IDLE = 3
 
+class SelectedWindow(Enum):
+    PROJECTS = 1
+    TASKS = 2
+    DESCRIPTION = 3
+
 def get_x_pos_center(text: str):
     return curses.COLS // 2 - len(text) // 2
 
-def draw_menu(stdscr, projects: list, idx: int):
+def draw_menu(stdscr, projects: list, idx: int, selected_window):
     # draw line
     stdscr.vline(0, menu_width, curses.ACS_VLINE, stdscr.getmaxyx()[0] - 1, curses.color_pair(CYAN_BLACK))
 
@@ -61,14 +67,14 @@ def draw_menu(stdscr, projects: list, idx: int):
 
     # draw projects
     y = 1
-    for i, project in enumerate(projects):
-        if i == idx:
+    for project_index, project in enumerate(projects):
+        if project_index == idx and SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
             stdscr.addstr(y, 0, project.title,curses.A_REVERSE)
         else:    
             stdscr.addstr(y, 0, project.title)
         y = y + 1
 
-def draw_tasks(stdscr, tasks):
+def draw_tasks(stdscr, tasks, selected_window):
     h, w = stdscr.getmaxyx()
 
     # draw middle devidor line
@@ -86,7 +92,8 @@ def draw_tasks(stdscr, tasks):
     
     # draw task names
     y = 1
-    for i, task in enumerate(tasks):
+    idx = 0
+    for i,task in enumerate(tasks):
         stdscr.addstr(y, menu_width + 1, task.title)
         y = y + 1
     
@@ -100,8 +107,9 @@ def main(stdscr):
     curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_GREEN)
     curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
 
-    k = 0 # input key
-    i = 0 # projects index
+    k = 0  # input key
+    project_index = 0 
+    selected_window = 1
     projects = []
     test_project = Project("Test")
     test_project.addTask(Task("testtask", "testdesc"))
@@ -113,21 +121,34 @@ def main(stdscr):
     test_project2.addTask(Task("yeet2"))
     test_project2.addTask(Task("yeet3"))
     projects.append(test_project2)
-    while (k != ord('q')):
 
+
+    while (k != ord('q')):
         if k == ord('e'):
             editing = not editing
         elif k == 450:  # up key
-            i = i - 1
-            if i < 0: i = len(projects) - 1
+            # only move the projects selection if we're on that pane
+            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS: 
+                project_index = project_index - 1
+                if project_index < 0: project_index = len(projects) - 1
         elif k == 456:  # down key
-            i = i + 1
-            if i > len(projects) - 1: i = 0
+            # only move the projects selection if we're on that pane
+            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
+                project_index = project_index + 1
+                if project_index > len(projects) - 1: project_index = 0
+        elif k == 454: # right key
+            selected_window = selected_window + 1
+            if selected_window > len(SelectedWindow):
+                selected_window = 1
+        elif k == 452: # left key
+            selected_window = selected_window - 1
+            if selected_window < 1:
+                selected_window = 3
             
         
         stdscr.clear()
-        draw_menu(stdscr, projects, i)
-        draw_tasks(stdscr, projects[i].tasks)
+        draw_menu(stdscr, projects, project_index,selected_window)
+        draw_tasks(stdscr, projects[project_index].tasks,selected_window)
         
         # draw botton text
         stdscr.addstr(stdscr.getmaxyx()[0]-1,0,"TPM by Sem van der Hoeven",)
