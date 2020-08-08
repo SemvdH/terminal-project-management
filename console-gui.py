@@ -9,6 +9,7 @@ MAGENTA_CYAN = 3
 YELLOW_BLACK = 4
 WHITE_BLUE = 5
 CYAN_BLACK = 6
+menu_width = 20
 
 """
     COLOR_BLACK
@@ -33,8 +34,8 @@ class Project:
         self.tasks.remove(task)
 
 class Task:
-    def __init__(self,name: str,desc=""):
-        self.name = name
+    def __init__(self,title: str,desc=""):
+        self.title = title
         self.status = Status.IDLE
 
 class Status(Enum):
@@ -46,7 +47,6 @@ def get_x_pos_center(text: str):
     return curses.COLS // 2 - len(text) // 2
 
 def draw_menu(stdscr, projects: list, idx: int):
-    menu_width = 20
     # draw line
     stdscr.vline(0, menu_width, curses.ACS_VLINE, stdscr.getmaxyx()[0] - 1, curses.color_pair(CYAN_BLACK))
 
@@ -56,7 +56,7 @@ def draw_menu(stdscr, projects: list, idx: int):
     stdscr.attron(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
     stdscr.addstr(0,0," " * (title_start-1))
     stdscr.addstr(0, title_start-1, title)
-    stdscr.addstr(0, len(title) + title_start - 1, " " * (menu_width - (len(title) + title_start)))
+    stdscr.addstr(0, len(title) + title_start - 1, " " * (menu_width - (len(title) + title_start)+1))
     stdscr.attroff(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
 
     # draw projects
@@ -68,9 +68,28 @@ def draw_menu(stdscr, projects: list, idx: int):
             stdscr.addstr(y, 0, project.title)
         y = y + 1
 
-def draw_tasks(stdscr):
+def draw_tasks(stdscr, tasks):
     h, w = stdscr.getmaxyx()
-    stdscr.vline(0,w//2,curses.ACS_VLINE,h-1,curses.color_pair(CYAN_BLACK))
+
+    # draw middle devidor line
+    stdscr.vline(0, w // 2, curses.ACS_VLINE, h - 1, curses.color_pair(CYAN_BLACK))
+
+    # draw tasks title
+    title = "TASKS"
+    width = w//2 - menu_width
+    title_start = menu_width + (width//2 - len(title)//2)
+    stdscr.attron(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
+    stdscr.addstr(0, menu_width + 1, " " * (title_start - menu_width))
+    stdscr.addstr(0,title_start,title)
+    stdscr.addstr(0,title_start + len(title), " " * (w//2 - (title_start + len(title))))
+    stdscr.attroff(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
+    
+    # draw task names
+    y = 1
+    for i, task in enumerate(tasks):
+        stdscr.addstr(y, menu_width + 1, task.title)
+        y = y + 1
+    
 
 def main(stdscr):
 
@@ -86,8 +105,14 @@ def main(stdscr):
     projects = []
     test_project = Project("Test")
     test_project.addTask(Task("testtask", "testdesc"))
+    test_project.addTask(Task("testtask2", "testdesc2"))
+    test_project.addTask(Task("testtask3", "testdesc3"))
     projects.append(test_project)
-    
+    test_project2 = Project("Test2")
+    test_project2.addTask(Task("yeet"))
+    test_project2.addTask(Task("yeet2"))
+    test_project2.addTask(Task("yeet3"))
+    projects.append(test_project2)
     while (k != ord('q')):
 
         if k == ord('e'):
@@ -102,7 +127,7 @@ def main(stdscr):
         
         stdscr.clear()
         draw_menu(stdscr, projects, i)
-        draw_tasks(stdscr)
+        draw_tasks(stdscr, projects[i].tasks)
         
         # draw botton text
         stdscr.addstr(stdscr.getmaxyx()[0]-1,0,"TPM by Sem van der Hoeven",)
