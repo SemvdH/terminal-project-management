@@ -56,6 +56,10 @@ def draw_menu(stdscr, projects: list, idx: int):
             stdscr.addstr(y, 0, project.title)
         y = y + 1
 
+def draw_tasks(stdscr):
+    h, w = stdscr.getmaxyx()
+    stdscr.vline(0,w//2,curses.ACS_VLINE,h-1,curses.color_pair(RED_BLACK))
+
 def main(stdscr):
 
     """
@@ -96,6 +100,7 @@ def main(stdscr):
         
         stdscr.clear()
         draw_menu(stdscr, projects, i)
+        draw_tasks(stdscr)
         
         # draw botton text
         stdscr.addstr(stdscr.getmaxyx()[0]-1,0,"TPM by Sem van der Hoeven",)
