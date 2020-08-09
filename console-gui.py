@@ -11,6 +11,8 @@ WHITE_BLUE = 5
 CYAN_BLACK = 6
 menu_width = 20
 
+ree = 30
+
 
 """
     COLOR_BLACK
@@ -44,6 +46,7 @@ class Status(Enum):
     WORKING = 2
     IDLE = 3
 
+# TODO maybe get rid of this enum and just use a number
 class SelectedWindow(Enum):
     PROJECTS = 1
     TASKS = 2
@@ -74,7 +77,7 @@ def draw_menu(stdscr, projects: list, idx: int, selected_window):
             stdscr.addstr(y, 0, project.title)
         y = y + 1
 
-def draw_tasks(stdscr, tasks, selected_window):
+def draw_tasks(stdscr, tasks, selected_window,idx):
     h, w = stdscr.getmaxyx()
 
     # draw middle devidor line
@@ -92,9 +95,13 @@ def draw_tasks(stdscr, tasks, selected_window):
     
     # draw task names
     y = 1
-    idx = 0
-    for i,task in enumerate(tasks):
-        stdscr.addstr(y, menu_width + 1, task.title)
+    # TODO make items light up when selected
+    # TODO add counter for increasing and decreasing selection for tasks
+    for i, task in enumerate(tasks):
+        if i == idx and SelectedWindow(selected_window) == SelectedWindow.TASKS:
+            stdscr.addstr(y, menu_width + 1, task.title,curses.A_REVERSE)
+        else:
+            stdscr.addstr(y, menu_width + 1, task.title)
         y = y + 1
     
 
@@ -108,7 +115,8 @@ def main(stdscr):
     curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
 
     k = 0  # input key
-    project_index = 0 
+    project_index = 0
+    task_index = 0
     selected_window = 1
     projects = []
     test_project = Project("Test")
@@ -131,11 +139,17 @@ def main(stdscr):
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS: 
                 project_index = project_index - 1
                 if project_index < 0: project_index = len(projects) - 1
+            elif SelectedWindow(selected_window) == SelectedWindow.TASKS:
+                task_index = task_index - 1
+                if task_index < 0: task_index = len(projects[project_index].tasks)-1
         elif k == 456:  # down key
             # only move the projects selection if we're on that pane
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 project_index = project_index + 1
                 if project_index > len(projects) - 1: project_index = 0
+            elif SelectedWindow(selected_window) == SelectedWindow.TASKS:
+                task_index = task_index + 1
+                if task_index > len(projects[project_index].tasks) - 1: task_index = 0
         elif k == 454: # right key
             selected_window = selected_window + 1
             if selected_window > len(SelectedWindow):
@@ -147,8 +161,8 @@ def main(stdscr):
             
         
         stdscr.clear()
-        draw_menu(stdscr, projects, project_index,selected_window)
-        draw_tasks(stdscr, projects[project_index].tasks,selected_window)
+        draw_menu(stdscr, projects, project_index, selected_window)
+        draw_tasks(stdscr, projects[project_index].tasks,selected_window,task_index)
         
         # draw botton text
         stdscr.addstr(stdscr.getmaxyx()[0]-1,0,"TPM by Sem van der Hoeven",)
