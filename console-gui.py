@@ -95,8 +95,6 @@ def draw_tasks(stdscr, tasks, selected_window,idx):
     
     # draw task names
     y = 1
-    # TODO make items light up when selected
-    # TODO add counter for increasing and decreasing selection for tasks
     for i, task in enumerate(tasks):
         if i == idx and SelectedWindow(selected_window) == SelectedWindow.TASKS:
             stdscr.addstr(y, menu_width + 1, task.title,curses.A_REVERSE)
@@ -139,25 +137,40 @@ def main(stdscr):
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS: 
                 project_index = project_index - 1
                 if project_index < 0: project_index = len(projects) - 1
+            # only move the task selection if we're on that pane
             elif SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 task_index = task_index - 1
                 if task_index < 0: task_index = len(projects[project_index].tasks)-1
+        
         elif k == 456:  # down key
             # only move the projects selection if we're on that pane
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 project_index = project_index + 1
                 if project_index > len(projects) - 1: project_index = 0
+            # only move the task selection if we're on that pane
             elif SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 task_index = task_index + 1
                 if task_index > len(projects[project_index].tasks) - 1: task_index = 0
+        
         elif k == 454: # right key
             selected_window = selected_window + 1
             if selected_window > len(SelectedWindow):
                 selected_window = 1
+
+            # set the task selection to the first for when we select a task next
+            # because the previous task we were on might have more tasks than this one,
+            # so we don't want the index to be out of bounds
+            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS: task_index = 0
+        
         elif k == 452: # left key
             selected_window = selected_window - 1
             if selected_window < 1:
                 selected_window = 3
+            
+            # set the task selection to the first for when we select a task next
+            # because the previous task we were on might have more tasks than this one,
+            # so we don't want the index to be out of bounds
+            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS: task_index = 0
             
         
         stdscr.clear()
