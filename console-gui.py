@@ -3,15 +3,19 @@ from curses import wrapper
 from curses.textpad import Textbox, rectangle
 from enum import Enum
 # doc: https://docs.python.org/3/howto/curses.html, https://docs.python.org/3/library/curses.html#module-curses.textpad
+
+# color combos
 CYAN_MAGENTA = 1
 RED_BLACK = 2
 MAGENTA_CYAN = 3
 YELLOW_BLACK = 4
 WHITE_BLUE = 5
 CYAN_BLACK = 6
-menu_width = 20
+MAGENTA_BLACK = 7
+WHITE_MAGENTA = 8
 
-ree = 30
+menu_width = 27
+controls_lines = 5
 
 
 """
@@ -111,6 +115,8 @@ def main(stdscr):
     curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_GREEN)
     curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(7, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+    curses.init_pair(8, curses.COLOR_WHITE, curses.COLOR_MAGENTA)
 
     k = 0  # input key
     project_index = 0
