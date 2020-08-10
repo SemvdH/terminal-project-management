@@ -15,12 +15,13 @@ MAGENTA_BLACK = 7
 WHITE_MAGENTA = 8
 WHITE_GREEN = 9
 WHITE_YELLOW = 10
+WHITE_CYAN = 11
 
 menu_width = 27
 controls_lines = 5
 
 STATUS_DONE = WHITE_GREEN
-STATUS_WORKING = WHITE_YELLOW
+STATUS_WORKING = WHITE_CYAN
 STATUS_IDLE = WHITE_MAGENTA
 
 
@@ -31,8 +32,6 @@ STATUS_IDLE = WHITE_MAGENTA
 # TODO add deleting of projects
 # TODO add adding of tasks
 # TODO add deleting of tasks
-# TODO add color explanation of status
-
 
 """
     COLOR_BLACK
@@ -82,9 +81,10 @@ def draw_instructions(stdscr):
     instructions_start = h - controls_lines-1
     stdscr.hline(instructions_start,0,curses.ACS_HLINE,menu_width//2 - len(controls)//2,curses.color_pair(MAGENTA_BLACK))
     stdscr.addstr(instructions_start,menu_width//2-len(controls)//2,controls,curses.color_pair(WHITE_MAGENTA))
-    stdscr.hline(instructions_start,menu_width//2+len(controls)//2,curses.ACS_HLINE,menu_width//2-len(controls)//2,curses.color_pair(MAGENTA_BLACK))
+    stdscr.hline(instructions_start,menu_width//2+len(controls)//2,curses.ACS_HLINE,menu_width//2-len(controls)//2+1,curses.color_pair(MAGENTA_BLACK))
     stdscr.addstr(instructions_start + 1, 0, "UP/DOWN - move selection")
     stdscr.addstr(instructions_start + 2, 0, "LEFT/RIGHT - switch section")
+    stdscr.addstr(instructions_start + 3, 0, "SPACE - change task status")
 
 def draw_menu(stdscr, projects: list, idx: int, selected_window):
     # draw line
@@ -133,6 +133,20 @@ def draw_tasks(stdscr, tasks, selected_window,idx):
             stdscr.addstr(y, menu_width + 1, task.title)
         y = y + 1
     
+    # draw color instructions
+    legend = "LEGEND"
+    instructions_start = h - controls_lines-1
+    stdscr.hline(instructions_start,menu_width+1,curses.ACS_HLINE,width//2-len(legend)//2-1,curses.color_pair(MAGENTA_BLACK))
+    stdscr.addstr(instructions_start, menu_width + width // 2 - len(legend)//2,legend,curses.color_pair(WHITE_MAGENTA))
+    stdscr.hline(instructions_start,menu_width+width//2+len(legend)//2,curses.ACS_HLINE,width//2- len(legend)//2,curses.color_pair(MAGENTA_BLACK))
+
+    stdscr.addstr(instructions_start + 1, menu_width + 1, " " * 3, curses.color_pair(STATUS_DONE))
+    stdscr.addstr(instructions_start + 1,menu_width + 4 + width - 2*len("DONE"),"DONE",curses.color_pair(STATUS_DONE))
+    stdscr.addstr(instructions_start + 2, menu_width + 1, " " * 3, curses.color_pair(STATUS_IDLE))
+    stdscr.addstr(instructions_start + 2,menu_width + 4 + width - 2*len("IDLE"),"IDLE",curses.color_pair(STATUS_IDLE))
+    stdscr.addstr(instructions_start + 3, menu_width + 1, " " * 3, curses.color_pair(STATUS_WORKING))
+    stdscr.addstr(instructions_start + 3,menu_width + 4 + width - int(1.5*len("WORKING")+1),"WORKING",curses.color_pair(STATUS_WORKING))
+
 
 def main(stdscr):
 
@@ -146,6 +160,7 @@ def main(stdscr):
     curses.init_pair(8, curses.COLOR_WHITE, curses.COLOR_MAGENTA)
     curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_GREEN)
     curses.init_pair(10, curses.COLOR_WHITE, curses.COLOR_YELLOW)
+    curses.init_pair(11, curses.COLOR_WHITE, curses.COLOR_CYAN)
 
 
     k = 0  # input key
