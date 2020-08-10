@@ -59,6 +59,17 @@ class SelectedWindow(Enum):
 def get_x_pos_center(text: str):
     return curses.COLS // 2 - len(text) // 2
 
+def draw_instructions(stdscr):
+    controls = "CONTROLS"
+    # draw line
+    h, w = stdscr.getmaxyx()
+    instructions_start = h - controls_lines-1
+    stdscr.hline(instructions_start,0,curses.ACS_HLINE,menu_width//2 - len(controls)//2,curses.color_pair(MAGENTA_BLACK))
+    stdscr.addstr(instructions_start,menu_width//2-len(controls)//2,controls,curses.color_pair(WHITE_MAGENTA))
+    stdscr.hline(instructions_start,menu_width//2+len(controls)//2,curses.ACS_HLINE,menu_width//2-len(controls)//2,curses.color_pair(MAGENTA_BLACK))
+    stdscr.addstr(instructions_start + 1, 0, "UP/DOWN - move selection")
+    stdscr.addstr(instructions_start + 2, 0, "LEFT/RIGHT - switch section")
+
 def draw_menu(stdscr, projects: list, idx: int, selected_window):
     # draw line
     stdscr.vline(0, menu_width, curses.ACS_VLINE, stdscr.getmaxyx()[0] - 1, curses.color_pair(CYAN_BLACK))
@@ -181,7 +192,8 @@ def main(stdscr):
         
         stdscr.clear()
         draw_menu(stdscr, projects, project_index, selected_window)
-        draw_tasks(stdscr, projects[project_index].tasks,selected_window,task_index)
+        draw_tasks(stdscr, projects[project_index].tasks, selected_window, task_index)
+        draw_instructions(stdscr)
         
         # draw botton text
         stdscr.addstr(stdscr.getmaxyx()[0]-1,0,"TPM by Sem van der Hoeven",)
