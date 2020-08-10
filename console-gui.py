@@ -13,9 +13,25 @@ WHITE_BLUE = 5
 CYAN_BLACK = 6
 MAGENTA_BLACK = 7
 WHITE_MAGENTA = 8
+WHITE_GREEN = 9
+WHITE_YELLOW = 10
 
 menu_width = 27
 controls_lines = 5
+
+STATUS_DONE = WHITE_GREEN
+STATUS_WORKING = WHITE_YELLOW
+STATUS_IDLE = WHITE_MAGENTA
+
+
+# TODO add status editing of tasks
+# TODO add description viewing
+# TODO add description editing
+# TODO add adding of projects
+# TODO add deleting of projects
+# TODO add adding of tasks
+# TODO add deleting of tasks
+# TODO add color explanation of status
 
 
 """
@@ -46,15 +62,15 @@ class Task:
         self.status = Status.IDLE
 
 class Status(Enum):
-    DONE = 1
-    WORKING = 2
-    IDLE = 3
+    NONE = 1
+    DONE = 2
+    WORKING = 3
+    IDLE = 4
 
 # TODO maybe get rid of this enum and just use a number
 class SelectedWindow(Enum):
     PROJECTS = 1
     TASKS = 2
-    DESCRIPTION = 3
 
 def get_x_pos_center(text: str):
     return curses.COLS // 2 - len(text) // 2
@@ -128,6 +144,9 @@ def main(stdscr):
     curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
     curses.init_pair(7, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
     curses.init_pair(8, curses.COLOR_WHITE, curses.COLOR_MAGENTA)
+    curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_GREEN)
+    curses.init_pair(10, curses.COLOR_WHITE, curses.COLOR_YELLOW)
+
 
     k = 0  # input key
     project_index = 0
@@ -182,7 +201,7 @@ def main(stdscr):
         elif k == 452: # left key
             selected_window = selected_window - 1
             if selected_window < 1:
-                selected_window = 3
+                selected_window = len(SelectedWindow)
             
             # set the task selection to the first for when we select a task next
             # because the previous task we were on might have more tasks than this one,
