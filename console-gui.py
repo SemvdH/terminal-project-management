@@ -24,6 +24,8 @@ STATUS_DONE = WHITE_GREEN
 STATUS_WORKING = WHITE_CYAN
 STATUS_IDLE = WHITE_MAGENTA
 
+statuses = [STATUS_WORKING,STATUS_IDLE,STATUS_DONE,0]
+
 
 # TODO add status editing of tasks
 # TODO add description viewing
@@ -58,13 +60,31 @@ class Project:
 class Task:
     def __init__(self,title: str,desc=""):
         self.title = title
-        self.status = Status.IDLE
+        self.status = Status.NONE
 
 class Status(Enum):
-    NONE = 1
+    WORKING = 0
+    IDLE = 1
     DONE = 2
-    WORKING = 3
-    IDLE = 4
+    NONE = 3
+
+    def prev(self):
+        print("previous of {}".format(self))
+        v = self.value - 1
+        if v < 0:
+            v = 3
+        print("previous is {}".format(Status(v)))
+        return Status(v)
+    
+    def next(self):
+        print("next of {}".format(self))
+        v = self.value + 1
+        if v > 3:
+            v = 0
+        print("next is {}".format(Status(v)))
+        return Status(v)
+
+        
 
 # TODO maybe get rid of this enum and just use a number
 class SelectedWindow(Enum):
@@ -127,10 +147,15 @@ def draw_tasks(stdscr, tasks, selected_window,idx):
     # draw task names
     y = 1
     for i, task in enumerate(tasks):
+        stdscr.attron(curses.color_pair(statuses[task.status.value]))
+        stdscr.addstr(y,menu_width+1," " * (width-1))
         if i == idx and SelectedWindow(selected_window) == SelectedWindow.TASKS:
-            stdscr.addstr(y, menu_width + 1, task.title,curses.A_REVERSE)
+            stdscr.addstr(y, menu_width + 1, task.title, curses.A_REVERSE)
         else:
             stdscr.addstr(y, menu_width + 1, task.title)
+        if task.status != Status.NONE:
+            stdscr.addstr(y, menu_width + width - len(task.status.name), task.status.name)
+        stdscr.attroff(curses.color_pair(statuses[task.status.value]))
         y = y + 1
     
     # draw color instructions
@@ -146,6 +171,8 @@ def draw_tasks(stdscr, tasks, selected_window,idx):
     stdscr.addstr(instructions_start + 2,menu_width + 4 + width - 2*len("IDLE"),"IDLE",curses.color_pair(STATUS_IDLE))
     stdscr.addstr(instructions_start + 3, menu_width + 1, " " * 3, curses.color_pair(STATUS_WORKING))
     stdscr.addstr(instructions_start + 3,menu_width + 4 + width - int(1.5*len("WORKING")+1),"WORKING",curses.color_pair(STATUS_WORKING))
+
+
 
 
 def main(stdscr):
@@ -222,6 +249,11 @@ def main(stdscr):
             # because the previous task we were on might have more tasks than this one,
             # so we don't want the index to be out of bounds
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS: task_index = 0
+
+        elif k == 32:  # space key
+            projects[project_index].tasks[task_index].status = projects[project_index].tasks[task_index].status.next()
+
+            
             
         
         stdscr.clear()
