@@ -27,13 +27,13 @@ STATUS_IDLE = WHITE_MAGENTA
 statuses = [STATUS_WORKING,STATUS_IDLE,STATUS_DONE,0]
 
 
-# TODO add status editing of tasks
 # TODO add description viewing
 # TODO add description editing
 # TODO add adding of projects
 # TODO add deleting of projects
 # TODO add adding of tasks
 # TODO add deleting of tasks
+# TODO add indicator of project even when switching task
 
 """
     COLOR_BLACK
