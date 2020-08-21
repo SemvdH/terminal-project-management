@@ -269,7 +269,7 @@ def main(stdscr):
     projects.append(test_project2)
 
     while (k != ord('q')):
-        if k == ord('e'):
+        if k == 10: # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 editing = not editing
         elif k == 450:  # up key
