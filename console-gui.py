@@ -233,7 +233,8 @@ def draw_description(stdscr, task, selected_window):
     
     if editing:
         entered_text = textpad.edit()
-        print(entered_text)
+        task.desc = entered_text
+        print(task.desc)
         editing = False
 
 
