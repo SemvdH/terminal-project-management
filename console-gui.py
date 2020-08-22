@@ -2,7 +2,7 @@ import curses
 from curses import wrapper
 from curses.textpad import Textbox, rectangle
 from enum import Enum
-import json
+import pickle
 
 # color combos
 CYAN_MAGENTA = 1
@@ -16,6 +16,7 @@ WHITE_MAGENTA = 8
 WHITE_GREEN = 9
 WHITE_YELLOW = 10
 WHITE_CYAN = 11
+FILENAME = "data"
 
 menu_width = 27
 controls_lines = 5
@@ -88,12 +89,20 @@ class Status(Enum):
         print("next is {}".format(Status(v)))
         return Status(v)
 
-
 # TODO maybe get rid of this enum and just use a number
 class SelectedWindow(Enum):
     PROJECTS = 1
     TASKS = 2
 
+def save(projects: list):
+    with open(FILENAME, 'wb') as savefile:
+        pickle.dump(projects,savefile, pickle.HIGHEST_PROTOCOL)
+
+def load():
+    try:
+        with open(FILENAME, 'rb') as data:
+            loaded = pickle.load(data)
+            return loaded
 
 def get_x_pos_center(text: str):
     return curses.COLS // 2 - len(text) // 2
@@ -277,18 +286,6 @@ def main(stdscr):
     project_index = 0
     task_index = 0
     selected_window = 1
-    projects = []
-
-    test_project = Project("Test")
-    test_project.addTask(Task("testtask", "testdesc"))
-    test_project.addTask(Task("testtask2", "testdesc2"))
-    test_project.addTask(Task("testtask3", "testdesc3"))
-    projects.append(test_project)
-    test_project2 = Project("Test2")
-    test_project2.addTask(Task("yeet", "yeet"))
-    test_project2.addTask(Task("yeet2", "yeet"))
-    test_project2.addTask(Task("yeet3", "yeet"))
-    projects.append(test_project2)
 
     while (k != ord('q')):
         if k == 10:  # enter key
