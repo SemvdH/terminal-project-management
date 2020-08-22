@@ -375,6 +375,7 @@ def main(stdscr):
         stdscr.refresh()
 
     curses.endwin()
+    save(projects)
 
 
 if __name__ == "__main__":
