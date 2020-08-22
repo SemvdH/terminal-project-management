@@ -103,6 +103,10 @@ def load():
         with open(FILENAME, 'rb') as data:
             loaded = pickle.load(data)
             return loaded
+    except FileNotFoundError as err:
+        temp_project = Project("Example project")
+        temp_project.addTask(Task("Example task", "This is an example of a task description.\nIt can be used to provide some extra information about the task."))
+        return [temp_project]
 
 def get_x_pos_center(text: str):
     return curses.COLS // 2 - len(text) // 2
@@ -209,7 +213,7 @@ def draw_tasks(stdscr, tasks, selected_window, idx):
                   int(1.5*len("WORKING")+1), "WORKING", curses.color_pair(STATUS_WORKING))
 
 
-def draw_description(stdscr, task, selected_window):
+def draw_description(projects,stdscr, task, selected_window):
     global editing
     h, w = stdscr.getmaxyx()
     begin = w // 2
@@ -265,6 +269,7 @@ def draw_description(stdscr, task, selected_window):
         scr2.addstr(0, 0, entered_text)
         scr2.refresh()
         editing = False
+        save(projects)
 
 
 def main(stdscr):
@@ -286,6 +291,18 @@ def main(stdscr):
     project_index = 0
     task_index = 0
     selected_window = 1
+    projects = load()
+
+    # test_project = Project("Test")
+    # test_project.addTask(Task("testtask", "testdesc"))
+    # test_project.addTask(Task("testtask2", "testdesc2"))
+    # test_project.addTask(Task("testtask3", "testdesc3"))
+    # projects.append(test_project)
+    # test_project2 = Project("Test2")
+    # test_project2.addTask(Task("yeet", "yeet"))
+    # test_project2.addTask(Task("yeet2", "yeet"))
+    # test_project2.addTask(Task("yeet3", "yeet"))
+    # projects.append(test_project2)
 
     while (k != ord('q')):
         if k == 10:  # enter key
@@ -352,7 +369,8 @@ def main(stdscr):
                    selected_window, task_index)
         draw_instructions(stdscr)
         draw_description(
-            stdscr, projects[project_index].tasks[task_index], selected_window)
+            projects,stdscr, projects[project_index].tasks[task_index], selected_window)
+    
         k = stdscr.getch()
         stdscr.refresh()
 
