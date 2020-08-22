@@ -1,7 +1,7 @@
 # Terminal Project Management
 by Sem van der Hoeven
 
-## contents
+## Contents
 
 - [Overview](#Overview)
 - [Installation](#Installation)
