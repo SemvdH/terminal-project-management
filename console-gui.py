@@ -29,7 +29,6 @@ STATUS_IDLE = WHITE_MAGENTA
 statuses = [STATUS_WORKING, STATUS_IDLE, STATUS_DONE, 0]
 
 
-# TODO add description viewing
 # TODO add description editing
 # TODO add adding of projects
 # TODO add deleting of projects
@@ -62,9 +61,10 @@ class Project:
 
 
 class Task:
-    def __init__(self, title: str, desc=""):
+    def __init__(self, title: str, desc: str):
         self.title = title
         self.status = Status.NONE
+        self.desc = desc
 
 
 class Status(Enum):
@@ -212,29 +212,50 @@ def draw_description(stdscr, task, selected_window):
         title = task.title.upper()
     else:
         title = "DESCRIPTION"
-    
+
     # draw the title
     title_start = begin + width // 2 - len(title) // 2
     stdscr.attron(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
     stdscr.addstr(0, begin + 1, " " * (title_start - begin))
     stdscr.addstr(0, title_start, title)
-    stdscr.addstr(0, title_start + len(title), " " * (width - len(title) - (title_start - begin) ))
+    stdscr.addstr(0, title_start + len(title), " " *
+                  (width - len(title) - (title_start - begin)))
     stdscr.attroff(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
 
     edit_win_lines = h - 4 - controls_lines
     edit_win_cols = w // 2 - 4
 
-    scr2 = curses.newwin(edit_win_lines,edit_win_cols , 2, w // 2 + 2)
+    # display the controls
+    controls_start = w // 2
+    controls = "EDITING CONTROLS"
+    instructions_start = h - controls_lines-1
+    stdscr.hline(instructions_start, controls_start + 1, curses.ACS_HLINE, controls_start//2 -
+                 len(controls)//2 , curses.color_pair(MAGENTA_BLACK))
+                 
+    stdscr.addstr(instructions_start,controls_start + (w//2)//2-len(controls)//2,
+                controls, curses.color_pair(WHITE_MAGENTA))
+    stdscr.hline(instructions_start, controls_start + (w//2)//2 + len(controls)//2+1, curses.ACS_HLINE,
+                 w // 2 - len(controls) // 2, curses.color_pair(MAGENTA_BLACK))
+    stdscr.addstr(instructions_start + 1, controls_start + 1, "CTRL+G - Stop editing")
+
+    scr2 = curses.newwin(edit_win_lines, edit_win_cols, 2, w // 2 + 2)
     # rectangle(stdscr, 1, w//2+1, h - controls_lines, w // 2)
     rectangle(stdscr, 1, w//2+1, h - controls_lines-2, w-2)
     stdscr.refresh()
     scr2.refresh()
-    textpad = Textbox(scr2)
-    
+    textpad = Textbox(scr2, insert_mode=True)
+    scr2.clear()
+    if SelectedWindow(selected_window) == SelectedWindow.TASKS:
+        scr2.addstr(0, 0, task.desc)
+    scr2.refresh()
+
     if editing:
         entered_text = textpad.edit()
         task.desc = entered_text
         print(task.desc)
+        scr2.clear()
+        scr2.addstr(0, 0, entered_text)
+        scr2.refresh()
         editing = False
 
 
@@ -265,13 +286,13 @@ def main(stdscr):
     test_project.addTask(Task("testtask3", "testdesc3"))
     projects.append(test_project)
     test_project2 = Project("Test2")
-    test_project2.addTask(Task("yeet"))
-    test_project2.addTask(Task("yeet2"))
-    test_project2.addTask(Task("yeet3"))
+    test_project2.addTask(Task("yeet", "yeet"))
+    test_project2.addTask(Task("yeet2", "yeet"))
+    test_project2.addTask(Task("yeet3", "yeet"))
     projects.append(test_project2)
 
     while (k != ord('q')):
-        if k == 10: # enter key
+        if k == 10:  # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 editing = not editing
         elif k == 450:  # up key
@@ -325,21 +346,24 @@ def main(stdscr):
                 projects[project_index].tasks[task_index].status = projects[project_index].tasks[task_index].status.next()
 
         stdscr.clear()
-        
+
         # draw botton text
-        stdscr.addstr(stdscr.getmaxyx()[0] - 1, 0, "TPM by Sem van der Hoeven",)
-        
+        stdscr.addstr(stdscr.getmaxyx()[0] - 1,
+                      0, "TPM by Sem van der Hoeven",)
+
         draw_projects(stdscr, projects, project_index, selected_window)
         draw_tasks(stdscr, projects[project_index].tasks,
                    selected_window, task_index)
         draw_instructions(stdscr)
-        draw_description(stdscr, projects[project_index].tasks[task_index],selected_window)
+        draw_description(
+            stdscr, projects[project_index].tasks[task_index], selected_window)
         k = stdscr.getch()
         stdscr.refresh()
 
     curses.endwin()
 
 
-# wrapper already calls noecho() and cbreak() and stdcr.keypad(True)
-# it also resets the settings upon closing or upon error
-wrapper(main)
+if __name__ == "__main__":
+    # wrapper already calls noecho() and cbreak() and stdcr.keypad(True)
+    # it also resets the settings upon closing or upon error
+    wrapper(main)
