@@ -2,7 +2,7 @@ import curses
 from curses import wrapper
 from curses.textpad import Textbox, rectangle
 from enum import Enum
-# doc: https://docs.python.org/3/howto/curses.html, https://docs.python.org/3/library/curses.html#module-curses.textpad
+import json
 
 # color combos
 CYAN_MAGENTA = 1
@@ -29,7 +29,6 @@ STATUS_IDLE = WHITE_MAGENTA
 statuses = [STATUS_WORKING, STATUS_IDLE, STATUS_DONE, 0]
 
 
-# TODO add description editing
 # TODO add adding of projects
 # TODO add deleting of projects
 # TODO add adding of tasks
