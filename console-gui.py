@@ -67,6 +67,7 @@ class Task:
         self.desc = desc
 
 
+# TODO maybe get rid of this enum and just use a number
 class Status(Enum):
     WORKING = 0
     IDLE = 1
@@ -89,7 +90,6 @@ class Status(Enum):
         print("next is {}".format(Status(v)))
         return Status(v)
 
-# TODO maybe get rid of this enum and just use a number
 class SelectedWindow(Enum):
     PROJECTS = 1
     TASKS = 2
@@ -107,6 +107,12 @@ def load():
         temp_project = Project("Example project")
         temp_project.addTask(Task("Example task", "This is an example of a task description.\nIt can be used to provide some extra information about the task."))
         return [temp_project]
+
+def create_project(projects: list):
+    pass
+
+def create_task(project):
+    pass
 
 def get_x_pos_center(text: str):
     return curses.COLS // 2 - len(text) // 2

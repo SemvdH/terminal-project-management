@@ -21,4 +21,5 @@ It gives a neat presentation of all your projects, which you can assign tasks to
 Download the file from the [releases page](https://github.com/SemvdH/terminal-project-management/releases) and run `python console-gui.py`
 
 # Usage
+https://github.com/lukesampson/scoop/wiki/Creating-an-app-manifest
 
