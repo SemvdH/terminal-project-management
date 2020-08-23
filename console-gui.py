@@ -311,10 +311,10 @@ def main(stdscr):
     # projects.append(test_project2)
 
     while (k != ord('q')):
-        if k == 10:  # enter key
+        if k == curses.KEY_ENTER or k == 10:  # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 editing = not editing
-        elif k == 450:  # up key
+        elif k == curses.KEY_UP or k == 450:  # up key
             # only move the projects selection if we're on that pane
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 project_index = project_index - 1
@@ -326,7 +326,7 @@ def main(stdscr):
                 if task_index < 0:
                     task_index = len(projects[project_index].tasks)-1
 
-        elif k == 456:  # down key
+        elif k == curses.KEY_DOWN or k == 456:  # down key
             # only move the projects selection if we're on that pane
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 project_index = project_index + 1
@@ -338,7 +338,7 @@ def main(stdscr):
                 if task_index > len(projects[project_index].tasks) - 1:
                     task_index = 0
 
-        elif k == 454:  # right key
+        elif k == curses.KEY_RIGHT or k == 454:  # right key
             selected_window = selected_window + 1
             if selected_window > len(SelectedWindow):
                 selected_window = 1
@@ -349,7 +349,7 @@ def main(stdscr):
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 task_index = 0
 
-        elif k == 452:  # left key
+        elif k == curses.KEY_LEFT or k == 452:  # left key
             selected_window = selected_window - 1
             if selected_window < 1:
                 selected_window = len(SelectedWindow)
