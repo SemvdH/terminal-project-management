@@ -299,17 +299,6 @@ def main(stdscr):
     selected_window = 1
     projects = load()
 
-    # test_project = Project("Test")
-    # test_project.addTask(Task("testtask", "testdesc"))
-    # test_project.addTask(Task("testtask2", "testdesc2"))
-    # test_project.addTask(Task("testtask3", "testdesc3"))
-    # projects.append(test_project)
-    # test_project2 = Project("Test2")
-    # test_project2.addTask(Task("yeet", "yeet"))
-    # test_project2.addTask(Task("yeet2", "yeet"))
-    # test_project2.addTask(Task("yeet3", "yeet"))
-    # projects.append(test_project2)
-
     while (k != ord('q')):
         if k == curses.KEY_ENTER or k == 10:  # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
