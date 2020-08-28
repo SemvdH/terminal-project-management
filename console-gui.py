@@ -51,6 +51,8 @@ class Project:
     def __init__(self, title: str):
         self.title = title
         self.tasks = []
+        self.tasks.append(Task(
+            "Example task", "Project: " + title + ". This is an example of a task description.\nIt can be used to provide some extra information about the task."))
 
     def addTask(self, task):
         self.tasks.append(task)
@@ -89,13 +91,16 @@ class Status(Enum):
         print("next is {}".format(Status(v)))
         return Status(v)
 
+
 class SelectedWindow(Enum):
     PROJECTS = 1
     TASKS = 2
 
+
 def save(projects: list):
     with open(FILENAME, 'wb') as savefile:
-        pickle.dump(projects,savefile, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(projects, savefile, pickle.HIGHEST_PROTOCOL)
+
 
 def load():
     try:
@@ -104,14 +109,16 @@ def load():
             return loaded
     except FileNotFoundError as err:
         temp_project = Project("Example project")
-        temp_project.addTask(Task("Example task", "This is an example of a task description.\nIt can be used to provide some extra information about the task."))
+        temp_project.addTask(Task(
+            "Example task", "This is an example of a task description.\nIt can be used to provide some extra information about the task."))
         return [temp_project]
 
-def create_project(projects: list, stdscr, si: int):
-    #TODO create project add window
+
+def create_project(projects: list, stdscr):
+    # TODO create project add window
 
     ###########################################################
-    #TODO handle inputs in here for this window, for when the user wants to reselect the name
+    # TODO handle inputs in here for this window, for when the user wants to reselect the name
     ###########################################################
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
@@ -119,39 +126,71 @@ def create_project(projects: list, stdscr, si: int):
     window = curses.newwin(7, 50, window_y, window_x)
     window.clear()
     window.border()
-    window.addstr(0, 5, "ADD PROJECT", curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
+
+    made_choice = False
+    window.addstr(0, 5, "ADD PROJECT", curses.color_pair(
+        YELLOW_BLACK) | curses.A_REVERSE)
     window.addstr(2, 1, "Project name:", curses.A_REVERSE)
-    window.addstr(4,25 - len("Ctrl + G to stop editing")//2,"Ctrl + G to stop editing")
+    window.addstr(4, 25 - len("Enter to confirm") //
+                  2, "Enter to confirm")
     lnstr = len("project name:")
 
     scr2 = curses.newwin(1, 47 - lnstr, window_y + 2, w // 2 - 23 + lnstr)
     scr2.clear()
     window.hline(3, lnstr + 1, curses.ACS_HLINE, 48 - lnstr)
-    
+
     window.refresh()
 
     textpad = Textbox(scr2, insert_mode=True)
+    entered = False
     project_name = textpad.edit()
     project_name = project_name[:-1]
-
-    window.addstr(4, 1, " " * 48)  # clear the "ctrl g to stop editing" message
+    # clear the "ctrl g to stop editing" message
+    window.addstr(4, 1, " " * 48)
 
     text = "Add project: '" + project_name + "'?"
     window.addstr(4, 25 - len(text) // 2, text)
+    si = 1
 
     # highlight the option yes if the selected index = 1, otherwise highlight no
-    window.addstr(5, 10, "YES",(2097152<<1) >> (si == 1))
+    window.addstr(5, 10, "YES", (2097152 << 1) >> (si == 1))
     window.addstr(5, 35, "NO", (2097152 << 1) >> (si != 1))
-    
-    
-    window.refresh()
+
+    k = 0
+    while (k != 10):
+
+        if k == curses.KEY_RIGHT or k == 454:
+            si = 2 if si == 1 else 1
+
+        elif k == curses.KEY_LEFT or k == 452:
+            si = 1 if si == 2 else 2
+
+        # highlight the option yes if the selected index = 1, otherwise highlight no
+        window.addstr(5, 10, "YES", (2097152 << 1) >> (si == 1))
+        window.addstr(5, 35, "NO", (2097152 << 1) >> (si != 1))
+
+        window.refresh()
+        scr2.refresh()
+        stdscr.refresh()
+        k = stdscr.getch()
+        if k == 10:
+            if si == 1:
+                # selected yes
+                projects.append(Project(project_name))
+
+    window.clear()
+    scr2.clear()
     scr2.refresh()
+    window.refresh()
     stdscr.refresh()
-    
+    del scr2
+    del window
+
 
 def create_task(project):
-    #TODO create task add window when add project window is made
+    # TODO create task add window when add project window is made
     pass
+
 
 def get_x_pos_center(text: str):
     return curses.COLS // 2 - len(text) // 2
@@ -258,7 +297,7 @@ def draw_tasks(stdscr, tasks, selected_window, idx):
                   int(1.5*len("WORKING")+1), "WORKING", curses.color_pair(STATUS_WORKING))
 
 
-def draw_description(projects,stdscr, task, selected_window):
+def draw_description(projects, stdscr, task, selected_window):
     global editing
     h, w = stdscr.getmaxyx()
     begin = w // 2
@@ -287,13 +326,14 @@ def draw_description(projects,stdscr, task, selected_window):
     controls = "EDITING CONTROLS"
     instructions_start = h - controls_lines-1
     stdscr.hline(instructions_start, controls_start + 1, curses.ACS_HLINE, controls_start//2 -
-                 len(controls)//2 , curses.color_pair(MAGENTA_BLACK))
-                 
-    stdscr.addstr(instructions_start,controls_start + (w//2)//2-len(controls)//2,
-                controls, curses.color_pair(WHITE_MAGENTA))
+                 len(controls)//2, curses.color_pair(MAGENTA_BLACK))
+
+    stdscr.addstr(instructions_start, controls_start + (w//2)//2-len(controls)//2,
+                  controls, curses.color_pair(WHITE_MAGENTA))
     stdscr.hline(instructions_start, controls_start + (w//2)//2 + len(controls)//2+1, curses.ACS_HLINE,
                  w // 2 - len(controls) // 2, curses.color_pair(MAGENTA_BLACK))
-    stdscr.addstr(instructions_start + 1, controls_start + 1, "CTRL+G - Stop editing")
+    stdscr.addstr(instructions_start + 1, controls_start +
+                  1, "CTRL+G - Stop editing")
 
     scr2 = curses.newwin(edit_win_lines, edit_win_cols, 2, w // 2 + 2)
     rectangle(stdscr, 1, w//2+1, h - controls_lines-2, w-2)
@@ -319,7 +359,6 @@ def draw_description(projects,stdscr, task, selected_window):
 def main(stdscr):
     global editing
 
-
     curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_MAGENTA)
     curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_CYAN)
@@ -336,13 +375,12 @@ def main(stdscr):
     project_index = 0
     task_index = 0
     selected_window = 1
-    select_index = 2
     projects = load()
     newp = False  # making new project
-    newt = False # making new task
+    newt = False  # making new task
 
     while (k != ord('q')):
-        
+
         if k == curses.KEY_ENTER or k == 10:  # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 editing = not editing
@@ -371,41 +409,34 @@ def main(stdscr):
                     task_index = 0
 
         elif k == curses.KEY_RIGHT or k == 454:  # right key
-            if not newp:
-                selected_window = selected_window + 1
-                if selected_window > len(SelectedWindow):
-                    selected_window = 1
+            selected_window = selected_window + 1
+            if selected_window > len(SelectedWindow):
+                selected_window = 1
 
-                # set the task selection to the first for when we select a task next
-                # because the previous task we were on might have more tasks than this one,
-                # so we don't want the index to be out of bounds
-                if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
-                    task_index = 0
-            else:
-                select_index = 2 if select_index == 1 else 1
+            # set the task selection to the first for when we select a task next
+            # because the previous task we were on might have more tasks than this one,
+            # so we don't want the index to be out of bounds
+            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
+                task_index = 0
 
         elif k == curses.KEY_LEFT or k == 452:  # left key
-            if not newp:
-                selected_window = selected_window - 1
-                if selected_window < 1:
-                    selected_window = len(SelectedWindow)
+            selected_window = selected_window - 1
+            if selected_window < 1:
+                selected_window = len(SelectedWindow)
 
-                # set the task selection to the first for when we select a task next
-                # because the previous task we were on might have more tasks than this one,
-                # so we don't want the index to be out of bounds
-                if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
-                    task_index = 0
-            else:
-                select_index = 1 if select_index == 2 else 2
-                pass
+            # set the task selection to the first for when we select a task next
+            # because the previous task we were on might have more tasks than this one,
+            # so we don't want the index to be out of bounds
+            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
+                task_index = 0
 
         elif k == 32:  # space key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 projects[project_index].tasks[task_index].status = projects[project_index].tasks[task_index].status.next()
 
-        elif (k == ord('p') or k == 112) and not newp: # p key
+        elif (k == ord('p') or k == 112) and not newp:  # p key
             newp = True
-            
+
         stdscr.clear()
 
         # draw botton text
@@ -418,8 +449,16 @@ def main(stdscr):
         draw_instructions(stdscr)
         draw_description(
             projects, stdscr, projects[project_index].tasks[task_index], selected_window)
+
         if newp:
-            create_project(projects, stdscr,select_index)
+            create_project(projects, stdscr)
+            newp = False
+            draw_projects(stdscr, projects, project_index, selected_window)
+            draw_tasks(stdscr, projects[project_index].tasks,
+                       selected_window, task_index)
+            draw_instructions(stdscr)
+            draw_description(
+                projects, stdscr, projects[project_index].tasks[task_index], selected_window)
 
         k = stdscr.getch()
         stdscr.refresh()
