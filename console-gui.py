@@ -113,13 +113,7 @@ def load():
             "Example task", "This is an example of a task description.\nIt can be used to provide some extra information about the task."))
         return [temp_project]
 
-
 def create_project(projects: list, stdscr):
-    # TODO create project add window
-
-    ###########################################################
-    # TODO handle inputs in here for this window, for when the user wants to reselect the name
-    ###########################################################
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
     window_x = w//2 - 25
@@ -187,8 +181,75 @@ def create_project(projects: list, stdscr):
     del window
 
 
-def create_task(project):
+def create_task(project,stdscr):
     # TODO create task add window when add project window is made
+    
+    h, w = stdscr.getmaxyx()
+    window_y = h // 2 - 3
+    window_x = w//2 - 25
+    window = curses.newwin(7, 50, window_y, window_x)
+    window.clear()
+    window.border()
+
+    made_choice = False
+    window.addstr(0, 5, "ADD TASK", curses.color_pair(
+        YELLOW_BLACK) | curses.A_REVERSE)
+    window.addstr(2, 1, "Task name:", curses.A_REVERSE)
+    window.addstr(4, 25 - len("Enter to confirm") //
+                  2, "Enter to confirm")
+    lnstr = len("Task name:")
+
+    scr2 = curses.newwin(1, 47 - lnstr, window_y + 2, w // 2 - 23 + lnstr)
+    scr2.clear()
+    window.hline(3, lnstr + 1, curses.ACS_HLINE, 48 - lnstr)
+
+    window.refresh()
+
+    textpad = Textbox(scr2, insert_mode=True)
+    entered = False
+    task_name = textpad.edit()
+    task_name = task_name[:-1]
+    # clear the "ctrl g to stop editing" message
+    window.addstr(4, 1, " " * 48)
+
+    text = "Add Task: '" + task_name + "'?"
+    window.addstr(4, 25 - len(text) // 2, text)
+    si = 1
+
+    # highlight the option yes if the selected index = 1, otherwise highlight no
+    window.addstr(5, 10, "YES", (2097152 << 1) >> (si == 1))
+    window.addstr(5, 35, "NO", (2097152 << 1) >> (si != 1))
+
+    k = 0
+    while (k != 10):
+
+        if k == curses.KEY_RIGHT or k == 454:
+            si = 2 if si == 1 else 1
+
+        elif k == curses.KEY_LEFT or k == 452:
+            si = 1 if si == 2 else 2
+
+        # highlight the option yes if the selected index = 1, otherwise highlight no
+        window.addstr(5, 10, "YES", (2097152 << 1) >> (si == 1))
+        window.addstr(5, 35, "NO", (2097152 << 1) >> (si != 1))
+
+        window.refresh()
+        scr2.refresh()
+        stdscr.refresh()
+        k = stdscr.getch()
+        if k == 10:
+            if si == 1:
+                # selected yes
+                project.addTask(Task(task_name,""))
+
+    window.clear()
+    scr2.clear()
+    scr2.refresh()
+    window.refresh()
+    stdscr.refresh()
+    del scr2
+    del window
+    
     pass
 
 
@@ -380,7 +441,7 @@ def main(stdscr):
     newt = False  # making new task
 
     while (k != ord('q')):
-
+        print(k)
         if k == curses.KEY_ENTER or k == 10:  # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 editing = not editing
@@ -436,6 +497,7 @@ def main(stdscr):
 
         elif (k == ord('p') or k == 112) and not newp:  # p key
             newp = True
+        # elif k == ord('t')
 
         stdscr.clear()
 
