@@ -84,7 +84,6 @@ class Status(Enum):
         return Status(v)
 
     def next(self):
-        print("next of {}".format(self))
         v = self.value + 1
         if v > 3:
             v = 0
@@ -441,7 +440,7 @@ def main(stdscr):
     newt = False  # making new task
 
     while (k != ord('q')):
-        print(k)
+        
         if k == curses.KEY_ENTER or k == 10:  # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 editing = not editing
@@ -497,7 +496,8 @@ def main(stdscr):
 
         elif (k == ord('p') or k == 112) and not newp:  # p key
             newp = True
-        # elif k == ord('t')
+        elif (k == ord('t') or k == 116) and not newt:  # t key
+            newt = True
 
         stdscr.clear()
 
@@ -515,12 +515,27 @@ def main(stdscr):
         if newp:
             create_project(projects, stdscr)
             newp = False
+
+            # TODO clean
             draw_projects(stdscr, projects, project_index, selected_window)
             draw_tasks(stdscr, projects[project_index].tasks,
                        selected_window, task_index)
             draw_instructions(stdscr)
             draw_description(
                 projects, stdscr, projects[project_index].tasks[task_index], selected_window)
+        
+        if newt:
+            create_task(projects[project_index], stdscr)
+            newt = False
+            
+            # TODO clean
+            draw_projects(stdscr, projects, project_index, selected_window)
+            draw_tasks(stdscr, projects[project_index].tasks,
+                       selected_window, task_index)
+            draw_instructions(stdscr)
+            draw_description(
+                projects, stdscr, projects[project_index].tasks[task_index], selected_window)
+
 
         k = stdscr.getch()
         stdscr.refresh()
