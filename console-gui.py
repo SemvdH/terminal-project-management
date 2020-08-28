@@ -107,7 +107,7 @@ def load():
     except FileNotFoundError as err:
         temp_project = Project("Example project")
         temp_project.addTask(Task(
-            "Example task", "This is an example of a task description.\nIt can be used to provide some extra information about the task."))
+            "Example task", "This is an example of a task description.\nIt can be used to provide some extra information about the task.\n\nControls:\nt - add new task to selected project\np - add new project"))
         return [temp_project]
 
 def create_project(projects: list, stdscr):
@@ -394,6 +394,7 @@ def draw_description(projects, stdscr, task, selected_window):
                  w // 2 - len(controls) // 2, curses.color_pair(MAGENTA_BLACK))
     stdscr.addstr(instructions_start + 1, controls_start +
                   1, "CTRL+G - Stop editing")
+    stdscr.addstr(instructions_start+2,controls_start+1,"ENTER - Edit selected task's description")
 
     scr2 = curses.newwin(edit_win_lines, edit_win_cols, 2, w // 2 + 2)
     rectangle(stdscr, 1, w//2+1, h - controls_lines-2, w-2)
