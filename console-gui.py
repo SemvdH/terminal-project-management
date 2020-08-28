@@ -51,8 +51,6 @@ class Project:
     def __init__(self, title: str):
         self.title = title
         self.tasks = []
-        self.tasks.append(Task(
-            "Example task", "Project: " + title + ". This is an example of a task description.\nIt can be used to provide some extra information about the task."))
 
     def addTask(self, task):
         self.tasks.append(task)
@@ -169,7 +167,9 @@ def create_project(projects: list, stdscr):
         if k == 10:
             if si == 1:
                 # selected yes
-                projects.append(Project(project_name))
+                temp = Project(project_name)
+                temp.addTask(Task("New task",""))
+                projects.append(temp)
 
     window.clear()
     scr2.clear()
