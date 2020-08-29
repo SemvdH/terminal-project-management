@@ -112,6 +112,8 @@ def load():
 
 
 def delete_project(stdscr, projects: list,project_index):
+
+    # need to make it prettier, also add ' around project title
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
     window_x = w // 2 - 25
