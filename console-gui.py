@@ -30,9 +30,8 @@ STATUS_IDLE = WHITE_MAGENTA
 statuses = [STATUS_WORKING, STATUS_IDLE, STATUS_DONE, 0]
 
 
-# TODO add adding of projects
+# TODO add controls for adding projects, tasks and deleting
 # TODO add deleting of projects
-# TODO add adding of tasks
 # TODO add deleting of tasks
 
 """
@@ -110,6 +109,18 @@ def load():
             "Example task", "This is an example of a task description.\nIt can be used to provide some extra information about the task.\n\nControls:\nt - add new task to selected project\np - add new project"))
         return [temp_project]
 
+
+def delete_project(stdscr, project):
+    h, w = stdscr.getmaxyx()
+    window_y = h // 2 - 3
+    window_x = w // 2 - 25
+    window = curses.newwin(7, 50, window_y, window_x)
+    window.clear()
+    window.border()
+
+    pass
+
+
 def create_project(projects: list, stdscr):
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
@@ -118,7 +129,6 @@ def create_project(projects: list, stdscr):
     window.clear()
     window.border()
 
-    made_choice = False
     window.addstr(0, 5, "ADD PROJECT", curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
     window.addstr(2, 1, "Project name:", curses.A_REVERSE)
@@ -133,7 +143,6 @@ def create_project(projects: list, stdscr):
     window.refresh()
 
     textpad = Textbox(scr2, insert_mode=True)
-    entered = False
     project_name = textpad.edit()
     project_name = project_name[:-1]
     # clear the "ctrl g to stop editing" message
@@ -168,7 +177,7 @@ def create_project(projects: list, stdscr):
             if si == 1:
                 # selected yes
                 temp = Project(project_name)
-                temp.addTask(Task("New task",""))
+                temp.addTask(Task("New task", ""))
                 projects.append(temp)
 
     window.clear()
@@ -180,9 +189,9 @@ def create_project(projects: list, stdscr):
     del window
 
 
-def create_task(project,stdscr):
+def create_task(project, stdscr):
     # TODO create task add window when add project window is made
-    
+
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
     window_x = w//2 - 25
@@ -190,7 +199,6 @@ def create_task(project,stdscr):
     window.clear()
     window.border()
 
-    made_choice = False
     window.addstr(0, 5, "ADD TASK", curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
     window.addstr(2, 1, "Task name:", curses.A_REVERSE)
@@ -205,7 +213,6 @@ def create_task(project,stdscr):
     window.refresh()
 
     textpad = Textbox(scr2, insert_mode=True)
-    entered = False
     task_name = textpad.edit()
     task_name = task_name[:-1]
     # clear the "ctrl g to stop editing" message
@@ -239,7 +246,7 @@ def create_task(project,stdscr):
         if k == 10:
             if si == 1:
                 # selected yes
-                project.addTask(Task(task_name,""))
+                project.addTask(Task(task_name, ""))
 
     window.clear()
     scr2.clear()
@@ -248,7 +255,7 @@ def create_task(project,stdscr):
     stdscr.refresh()
     del scr2
     del window
-    
+
     pass
 
 
@@ -394,7 +401,8 @@ def draw_description(projects, stdscr, task, selected_window):
                  w // 2 - len(controls) // 2, curses.color_pair(MAGENTA_BLACK))
     stdscr.addstr(instructions_start + 1, controls_start +
                   1, "CTRL+G - Stop editing")
-    stdscr.addstr(instructions_start+2,controls_start+1,"ENTER - Edit selected task's description")
+    stdscr.addstr(instructions_start+2, controls_start+1,
+                  "ENTER - Edit selected task's description")
 
     scr2 = curses.newwin(edit_win_lines, edit_win_cols, 2, w // 2 + 2)
     rectangle(stdscr, 1, w//2+1, h - controls_lines-2, w-2)
@@ -441,7 +449,7 @@ def main(stdscr):
     newt = False  # making new task
 
     while (k != ord('q')):
-        
+
         if k == curses.KEY_ENTER or k == 10:  # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 editing = not editing
@@ -524,11 +532,11 @@ def main(stdscr):
             draw_instructions(stdscr)
             draw_description(
                 projects, stdscr, projects[project_index].tasks[task_index], selected_window)
-        
+
         if newt:
             create_task(projects[project_index], stdscr)
             newt = False
-            
+
             # TODO clean
             draw_projects(stdscr, projects, project_index, selected_window)
             draw_tasks(stdscr, projects[project_index].tasks,
@@ -536,7 +544,6 @@ def main(stdscr):
             draw_instructions(stdscr)
             draw_description(
                 projects, stdscr, projects[project_index].tasks[task_index], selected_window)
-
 
         k = stdscr.getch()
         stdscr.refresh()
