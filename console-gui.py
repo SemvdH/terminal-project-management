@@ -110,15 +110,44 @@ def load():
         return [temp_project]
 
 
-def delete_project(stdscr, project):
+
+def delete_project(stdscr, projects: list,project_index):
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
     window_x = w // 2 - 25
-    window = curses.newwin(7, 50, window_y, window_x)
+    window = curses.newwin(6, 50, window_y, window_x)
     window.clear()
     window.border()
 
-    pass
+    window.addstr(0,5,"DELETE PROJECT", curses.color_pair(
+        YELLOW_BLACK) | curses.A_REVERSE)
+    window.addstr(2,1,"Delete " + projects[project_index].title + "?",curses.A_REVERSE)
+
+    si = 1
+    # highlight the option yes if the selected index = 1, otherwise highlight no
+    window.addstr(4, 10, "YES", (2097152 << 1) >> (si == 1))
+    window.addstr(4, 35, "NO", (2097152 << 1) >> (si != 1))
+
+    k = 0
+    while (k != 10):
+
+        if k == curses.KEY_RIGHT or k == 454:
+            si = 2 if si == 1 else 1
+
+        elif k == curses.KEY_LEFT or k == 452:
+            si = 1 if si == 2 else 2
+
+        # highlight the option yes if the selected index = 1, otherwise highlight no
+        window.addstr(4, 10, "YES", (2097152 << 1) >> (si == 1))
+        window.addstr(4, 35, "NO", (2097152 << 1) >> (si != 1))
+
+        window.refresh()
+        stdscr.refresh()
+        k = stdscr.getch()
+        if k == 10:
+            if si == 1:
+                projects.remove(projects[project_index])
+                
 
 
 def create_project(projects: list, stdscr):
@@ -449,6 +478,8 @@ def main(stdscr):
     newt = False  # making new task
 
     while (k != ord('q')):
+        
+        
 
         if k == curses.KEY_ENTER or k == 10:  # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
@@ -507,6 +538,13 @@ def main(stdscr):
             newp = True
         elif (k == ord('t') or k == 116) and not newt:  # t key
             newt = True
+        
+        elif k == 330:  # delete key
+            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
+                delete_project(stdscr, projects, project_index)
+                project_index = 0
+            
+
 
         stdscr.clear()
 
