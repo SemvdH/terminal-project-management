@@ -322,8 +322,6 @@ def create_task(project, stdscr):
     del scr2
     del window
 
-    pass
-
 
 def get_x_pos_center(text: str):
     return curses.COLS // 2 - len(text) // 2
@@ -366,20 +364,29 @@ def draw_tasks(stdscr, projects, project_index, selected_window, idx):
     width = w//2 - menu_width
 
     tasks = projects[project_index].tasks
-    # draw task names
-    y = 1
-    for i, task in enumerate(tasks):
-        stdscr.attron(curses.color_pair(statuses[task.status.value]))
-        stdscr.addstr(y, menu_width+1, " " * (width-1))
-        if i == idx and SelectedWindow(selected_window) == SelectedWindow.TASKS:
-            stdscr.addstr(y, menu_width + 1, task.title, curses.A_REVERSE)
+    if len(tasks) != 0:
+        # draw task names
+        y = 1
+        for i, task in enumerate(tasks):
+            stdscr.attron(curses.color_pair(statuses[task.status.value]))
+            stdscr.addstr(y, menu_width+1, " " * (width-1))
+            if i == idx and SelectedWindow(selected_window) == SelectedWindow.TASKS:
+                stdscr.addstr(y, menu_width + 1, task.title, curses.A_REVERSE)
+            else:
+                stdscr.addstr(y, menu_width + 1, task.title)
+            if task.status != Status.NONE:
+                stdscr.addstr(y, menu_width + width -
+                            len(task.status.name), task.status.name)
+            stdscr.attroff(curses.color_pair(statuses[task.status.value]))
+            y = y + 1
+    else:
+        stdscr.addstr(1, menu_width + 1 + width//2 - len("NO TASKS")//2, "NO TASKS", curses.color_pair(WHITE_MAGENTA))
+        text = "Press 't' to add a new task"
+        if len(text) > width:
+            stdscr.addstr(2, menu_width + 1, text[: (width - 1)])
+            stdscr.addstr(3,menu_width+1,text[(width-1):])
         else:
-            stdscr.addstr(y, menu_width + 1, task.title)
-        if task.status != Status.NONE:
-            stdscr.addstr(y, menu_width + width -
-                          len(task.status.name), task.status.name)
-        stdscr.attroff(curses.color_pair(statuses[task.status.value]))
-        y = y + 1
+            stdscr.addstr(2, menu_width + 1, text)
 
 
 def draw_description(projects, stdscr, project_index,task_index, selected_window):
@@ -387,13 +394,19 @@ def draw_description(projects, stdscr, project_index,task_index, selected_window
     h, w = stdscr.getmaxyx()
     begin = w // 2
     width = w // 2
+    title = ""
+    task = None
+    can_edit = len(projects) != 0 and len(projects[project_index].tasks) != 0
 
-    task = projects[project_index].tasks[task_index]
-    # put description if we haven't selected a task
-    if SelectedWindow(selected_window) == SelectedWindow.TASKS:
-        title = task.title.upper()
-    else:
-        title = "DESCRIPTION"
+    if can_edit:
+        task = projects[project_index].tasks[task_index]
+        # put description if we haven't selected a task
+        if SelectedWindow(selected_window) == SelectedWindow.TASKS:
+            title = task.title.upper()
+        else:
+            title = "DESCRIPTION"
+    else: title = "DESCRIPTION"
+
 
     # draw the title
     title_start = begin + width // 2 - len(title) // 2
@@ -407,33 +420,17 @@ def draw_description(projects, stdscr, project_index,task_index, selected_window
     edit_win_lines = h - 4 - controls_lines
     edit_win_cols = w // 2 - 4
 
-    # display the controls
-    controls_start = w // 2
-    controls = "EDITING CONTROLS"
-    instructions_start = h - controls_lines-1
-    stdscr.hline(instructions_start, controls_start + 1, curses.ACS_HLINE, controls_start//2 -
-                 len(controls)//2, curses.color_pair(MAGENTA_BLACK))
-
-    stdscr.addstr(instructions_start, controls_start + (w//2)//2-len(controls)//2,
-                  controls, curses.color_pair(WHITE_MAGENTA))
-    stdscr.hline(instructions_start, controls_start + (w//2)//2 + len(controls)//2+1, curses.ACS_HLINE,
-                 w // 2 - len(controls) // 2, curses.color_pair(MAGENTA_BLACK))
-    stdscr.addstr(instructions_start + 1, controls_start +
-                  1, "CTRL+G - Stop editing")
-    stdscr.addstr(instructions_start+2, controls_start+1,
-                  "ENTER - Edit selected task's description")
-
     scr2 = curses.newwin(edit_win_lines, edit_win_cols, 2, w // 2 + 2)
     rectangle(stdscr, 1, w//2+1, h - controls_lines-2, w-2)
     stdscr.refresh()
     scr2.refresh()
     textpad = Textbox(scr2, insert_mode=True)
     scr2.clear()
-    if SelectedWindow(selected_window) == SelectedWindow.TASKS:
+    if SelectedWindow(selected_window) == SelectedWindow.TASKS and can_edit:
         scr2.addstr(0, 0, task.desc)
     scr2.refresh()
 
-    if editing:
+    if editing and can_edit:
         entered_text = textpad.edit()
         task.desc = entered_text
         print(task.desc)
@@ -503,6 +500,22 @@ def draw_layout(stdscr):
     stdscr.addstr(instructions_start + 3, menu_width + 4 + width -
                   int(1.5*len("WORKING")+1), "WORKING", curses.color_pair(STATUS_WORKING))
 
+    # display the controls
+    controls_start = w // 2
+    controls = "EDITING CONTROLS"
+    instructions_start = h - controls_lines-1
+    stdscr.hline(instructions_start, controls_start + 1, curses.ACS_HLINE, controls_start//2 -
+                 len(controls)//2, curses.color_pair(MAGENTA_BLACK))
+
+    stdscr.addstr(instructions_start, controls_start + (w//2)//2-len(controls)//2,
+                  controls, curses.color_pair(WHITE_MAGENTA))
+    stdscr.hline(instructions_start, controls_start + (w//2)//2 + len(controls)//2+1, curses.ACS_HLINE,
+                 w // 2 - len(controls) // 2, curses.color_pair(MAGENTA_BLACK))
+    stdscr.addstr(instructions_start + 1, controls_start +
+                  1, "CTRL+G - Stop editing")
+    stdscr.addstr(instructions_start+2, controls_start+1,
+                  "ENTER - Edit selected task's description")
+
 def draw_sections(stdscr, projects: list, project_index: int,task_index: int,selected_window: int):
     draw_layout(stdscr)
 
@@ -538,71 +551,80 @@ def main(stdscr):
     newt = False  # making new task
 
     while (k != ord('q')):
+        has_projects = len(projects) != 0
 
         if k == curses.KEY_ENTER or k == 10:  # enter key
-            if SelectedWindow(selected_window) == SelectedWindow.TASKS:
+            if SelectedWindow(selected_window) == SelectedWindow.TASKS and has_projects:
                 editing = not editing
         elif k == curses.KEY_UP or k == 450:  # up key
-            # only move the projects selection if we're on that pane
-            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
-                project_index = project_index - 1
-                if project_index < 0:
-                    project_index = len(projects) - 1
-            # only move the task selection if we're on that pane
-            elif SelectedWindow(selected_window) == SelectedWindow.TASKS:
-                task_index = task_index - 1
-                if task_index < 0:
-                    task_index = len(projects[project_index].tasks)-1
+            if has_projects:
+                # only move the projects selection if we're on that pane
+                if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
+                    project_index = project_index - 1
+                    if project_index < 0:
+                        project_index = len(projects) - 1
+                # only move the task selection if we're on that pane
+                elif SelectedWindow(selected_window) == SelectedWindow.TASKS and len(projects[project_index].tasks) != 0:
+                        task_index = task_index - 1
+                        if task_index < 0:
+                            task_index = len(projects[project_index].tasks)-1
 
         elif k == curses.KEY_DOWN or k == 456:  # down key
-            # only move the projects selection if we're on that pane
-            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
-                project_index = project_index + 1
-                if project_index > len(projects) - 1:
-                    project_index = 0
-            # only move the task selection if we're on that pane
-            elif SelectedWindow(selected_window) == SelectedWindow.TASKS:
-                task_index = task_index + 1
-                if task_index > len(projects[project_index].tasks) - 1:
-                    task_index = 0
+            if has_projects:
+                # only move the projects selection if we're on that pane
+                if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
+                    project_index = project_index + 1
+                    if project_index > len(projects) - 1:
+                        project_index = 0
+                # only move the task selection if we're on that pane
+                elif SelectedWindow(selected_window) == SelectedWindow.TASKS and len(projects[project_index].tasks) != 0:
+                    task_index = task_index + 1
+                    if task_index > len(projects[project_index].tasks) - 1:
+                        task_index = 0
 
         elif k == curses.KEY_RIGHT or k == 454:  # right key
-            selected_window = selected_window + 1
-            if selected_window > len(SelectedWindow):
-                selected_window = 1
+            if has_projects:
+                selected_window = selected_window + 1 if len(projects[project_index].tasks) != 0 else 1
+                if selected_window > len(SelectedWindow):
+                    selected_window = 1
 
-            # set the task selection to the first for when we select a task next
-            # because the previous task we were on might have more tasks than this one,
-            # so we don't want the index to be out of bounds
-            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
-                task_index = 0
+                # set the task selection to the first for when we select a task next
+                # because the previous task we were on might have more tasks than this one,
+                # so we don't want the index to be out of bounds
+                if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
+                    task_index = 0
 
         elif k == curses.KEY_LEFT or k == 452:  # left key
-            selected_window = selected_window - 1
-            if selected_window < 1:
-                selected_window = len(SelectedWindow)
+            if has_projects:
+                selected_window = selected_window - 1
+                if selected_window < 1:
+                    if len(projects[project_index].tasks) != 0:
+                        selected_window = len(SelectedWindow)
+                    else:
+                        selected_window = 1
 
-            # set the task selection to the first for when we select a task next
-            # because the previous task we were on might have more tasks than this one,
-            # so we don't want the index to be out of bounds
-            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
-                task_index = 0
+                # set the task selection to the first for when we select a task next
+                # because the previous task we were on might have more tasks than this one,
+                # so we don't want the index to be out of bounds
+                if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
+                    task_index = 0
 
         elif k == 32:  # space key
-            if SelectedWindow(selected_window) == SelectedWindow.TASKS:
+            if SelectedWindow(selected_window) == SelectedWindow.TASKS and has_projects and len(projects[project_index].tasks) != 0:
                 projects[project_index].tasks[task_index].status = projects[project_index].tasks[task_index].status.next()
 
         elif (k == ord('p') or k == 112) and not newp:  # p key
             newp = True
-        elif (k == ord('t') or k == 116) and not newt:  # t key
+        elif (k == ord('t') or k == 116) and not newt and has_projects:  # t key
             newt = True
 
-        elif k == 330:  # delete key
+        elif k == 330 and has_projects:  # delete key
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 delete_project(stdscr, projects, project_index)
                 project_index = 0
-            elif SelectedWindow(selected_window) == SelectedWindow.TASKS:
+            elif SelectedWindow(selected_window) == SelectedWindow.TASKS and len(projects[project_index].tasks) != 0:
                 delete_task(stdscr, projects[project_index], task_index)
+                if len(projects[project_index].tasks) == 0: selected_window = 1
                 task_index = 0
 
         stdscr.clear()
