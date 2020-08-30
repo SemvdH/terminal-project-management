@@ -31,8 +31,6 @@ statuses = [STATUS_WORKING, STATUS_IDLE, STATUS_DONE, 0]
 
 
 # TODO add controls for adding projects, tasks and deleting
-# TODO add deleting of projects
-# TODO add deleting of tasks
 
 """
     COLOR_BLACK
@@ -242,9 +240,7 @@ def create_project(projects: list, stdscr):
         if k == 10:
             if si == 1:
                 # selected yes
-                temp = Project(project_name)
-                temp.addTask(Task("New task", ""))
-                projects.append(temp)
+                projects.append(Project(project_name))
 
     window.clear()
     scr2.clear()
@@ -345,48 +341,58 @@ def draw_instructions(stdscr):
 
 def draw_projects(stdscr, projects: list, idx: int, selected_window):
 
-    # draw projects
-    y = 1
-    for project_index, project in enumerate(projects):
-        if project_index == idx:
-            if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
-                stdscr.addstr(y, 0, project.title, curses.A_REVERSE)
+    if len(projects) != 0:        
+        # draw projects
+        y = 1
+        for project_index, project in enumerate(projects):
+            if project_index == idx:
+                if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
+                    stdscr.addstr(y, 0, project.title, curses.A_REVERSE)
+                else:
+                    stdscr.addstr(y, 0, "-- " + project.title)
             else:
-                stdscr.addstr(y, 0, "-- " + project.title)
+                stdscr.addstr(y, 0, project.title)
+            y = y + 1
+    else:
+        stdscr.addstr(1, menu_width//2 - len("NO PROJECTS")//2, "NO PROJECTS", curses.color_pair(WHITE_MAGENTA))
+        text = "Press 'p' to add a new project"
+        if len(text) > menu_width:
+            stdscr.addstr(2, 0, text[: (menu_width - 1)])
+            stdscr.addstr(3,0,text[(menu_width-1):])
         else:
-            stdscr.addstr(y, 0, project.title)
-        y = y + 1
+            stdscr.addstr(2, 0, text)
 
 
 def draw_tasks(stdscr, projects, project_index, selected_window, idx):
     h, w = stdscr.getmaxyx()
 
-    width = w//2 - menu_width
+    if len(projects) != 0:
+        width = w//2 - menu_width
 
-    tasks = projects[project_index].tasks
-    if len(tasks) != 0:
-        # draw task names
-        y = 1
-        for i, task in enumerate(tasks):
-            stdscr.attron(curses.color_pair(statuses[task.status.value]))
-            stdscr.addstr(y, menu_width+1, " " * (width-1))
-            if i == idx and SelectedWindow(selected_window) == SelectedWindow.TASKS:
-                stdscr.addstr(y, menu_width + 1, task.title, curses.A_REVERSE)
-            else:
-                stdscr.addstr(y, menu_width + 1, task.title)
-            if task.status != Status.NONE:
-                stdscr.addstr(y, menu_width + width -
-                            len(task.status.name), task.status.name)
-            stdscr.attroff(curses.color_pair(statuses[task.status.value]))
-            y = y + 1
-    else:
-        stdscr.addstr(1, menu_width + 1 + width//2 - len("NO TASKS")//2, "NO TASKS", curses.color_pair(WHITE_MAGENTA))
-        text = "Press 't' to add a new task"
-        if len(text) > width:
-            stdscr.addstr(2, menu_width + 1, text[: (width - 1)])
-            stdscr.addstr(3,menu_width+1,text[(width-1):])
+        tasks = projects[project_index].tasks
+        if len(tasks) != 0:
+            # draw task names
+            y = 1
+            for i, task in enumerate(tasks):
+                stdscr.attron(curses.color_pair(statuses[task.status.value]))
+                stdscr.addstr(y, menu_width+1, " " * (width-1))
+                if i == idx and SelectedWindow(selected_window) == SelectedWindow.TASKS:
+                    stdscr.addstr(y, menu_width + 1, task.title, curses.A_REVERSE)
+                else:
+                    stdscr.addstr(y, menu_width + 1, task.title)
+                if task.status != Status.NONE:
+                    stdscr.addstr(y, menu_width + width -
+                                len(task.status.name), task.status.name)
+                stdscr.attroff(curses.color_pair(statuses[task.status.value]))
+                y = y + 1
         else:
-            stdscr.addstr(2, menu_width + 1, text)
+            stdscr.addstr(1, menu_width + 1 + width//2 - len("NO TASKS")//2, "NO TASKS", curses.color_pair(WHITE_MAGENTA))
+            text = "Press 't' to add a new task"
+            if len(text) > width:
+                stdscr.addstr(2, menu_width + 1, text[: (width - 1)])
+                stdscr.addstr(3,menu_width+1,text[(width-1):])
+            else:
+                stdscr.addstr(2, menu_width + 1, text)
 
 
 def draw_description(projects, stdscr, project_index,task_index, selected_window):
@@ -517,6 +523,7 @@ def draw_layout(stdscr):
                   "ENTER - Edit selected task's description")
 
 def draw_sections(stdscr, projects: list, project_index: int,task_index: int,selected_window: int):
+    stdscr.clear()
     draw_layout(stdscr)
 
     draw_projects(stdscr, projects, project_index, selected_window)
@@ -634,8 +641,7 @@ def main(stdscr):
         if newp:
             create_project(projects, stdscr)
             newp = False
-
-            draw_sections(stdscr,projects,project_index,task_index,selected_window)
+            draw_sections(stdscr, projects, project_index, task_index, selected_window)
 
         if newt:
             create_task(projects[project_index], stdscr)
