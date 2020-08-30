@@ -363,11 +363,12 @@ def draw_projects(stdscr, projects: list, idx: int, selected_window):
         y = y + 1
 
 
-def draw_tasks(stdscr, tasks, selected_window, idx):
+def draw_tasks(stdscr, projects, project_index, selected_window, idx):
     h, w = stdscr.getmaxyx()
 
     width = w//2 - menu_width
 
+    tasks = projects[project_index].tasks
     # draw task names
     y = 1
     for i, task in enumerate(tasks):
@@ -384,12 +385,13 @@ def draw_tasks(stdscr, tasks, selected_window, idx):
         y = y + 1
 
 
-def draw_description(projects, stdscr, task, selected_window):
+def draw_description(projects, stdscr, project_index,task_index, selected_window):
     global editing
     h, w = stdscr.getmaxyx()
     begin = w // 2
     width = w // 2
 
+    task = projects[project_index].tasks[task_index]
     # put description if we haven't selected a task
     if SelectedWindow(selected_window) == SelectedWindow.TASKS:
         title = task.title.upper()
@@ -508,11 +510,11 @@ def draw_sections(stdscr, projects: list, project_index: int,task_index: int,sel
     draw_layout(stdscr)
 
     draw_projects(stdscr, projects, project_index, selected_window)
-    draw_tasks(stdscr, projects[project_index].tasks,
+    draw_tasks(stdscr, projects,project_index,
                    selected_window, task_index)
     draw_instructions(stdscr)
     draw_description(
-            projects, stdscr, projects[project_index].tasks[task_index], selected_window)
+            projects, stdscr, project_index, task_index,selected_window)
 
 
 def main(stdscr):
