@@ -113,7 +113,6 @@ def load():
 
 def delete_project(stdscr, projects: list,project_index):
 
-    # need to make it prettier, also add ' around project title
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
     window_x = w // 2 - 25
@@ -123,7 +122,7 @@ def delete_project(stdscr, projects: list,project_index):
 
     window.addstr(0,5,"DELETE PROJECT", curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
-    window.addstr(2,1,"Delete " + projects[project_index].title + "?",curses.A_REVERSE)
+    window.addstr(2,1,"Delete project '" + projects[project_index].title + "'?")
 
     si = 1
     # highlight the option yes if the selected index = 1, otherwise highlight no
@@ -150,7 +149,43 @@ def delete_project(stdscr, projects: list,project_index):
             if si == 1:
                 projects.remove(projects[project_index])
                 
+def delete_task(stdscr, project, task_index):
+    h, w = stdscr.getmaxyx()
+    window_y = h // 2 - 3
+    window_x = w // 2 - 25
+    window = curses.newwin(6, 50, window_y, window_x)
+    window.clear()
+    window.border()
 
+    window.addstr(0,5,"DELETE TASK", curses.color_pair(
+        YELLOW_BLACK) | curses.A_REVERSE)
+    window.addstr(2,1,"Delete task '" + project.tasks[task_index].title + "'?")
+
+    si = 1
+    # highlight the option yes if the selected index = 1, otherwise highlight no
+    window.addstr(4, 10, "YES", (2097152 << 1) >> (si == 1))
+    window.addstr(4, 35, "NO", (2097152 << 1) >> (si != 1))
+
+    k = 0
+    while (k != 10):
+
+        if k == curses.KEY_RIGHT or k == 454:
+            si = 2 if si == 1 else 1
+
+        elif k == curses.KEY_LEFT or k == 452:
+            si = 1 if si == 2 else 2
+
+        # highlight the option yes if the selected index = 1, otherwise highlight no
+        window.addstr(4, 10, "YES", (2097152 << 1) >> (si == 1))
+        window.addstr(4, 35, "NO", (2097152 << 1) >> (si != 1))
+
+        window.refresh()
+        stdscr.refresh()
+        k = stdscr.getch()
+        if k == 10:
+            if si == 1:
+                project.removeTask(project.tasks[task_index])
+    pass
 
 def create_project(projects: list, stdscr):
     h, w = stdscr.getmaxyx()
@@ -545,6 +580,9 @@ def main(stdscr):
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 delete_project(stdscr, projects, project_index)
                 project_index = 0
+            elif SelectedWindow(selected_window) == SelectedWindow.TASKS:
+                delete_task(stdscr, projects[project_index], task_index)
+                task_index = 0
             
 
 
