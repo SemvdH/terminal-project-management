@@ -110,8 +110,7 @@ def load():
         return [temp_project]
 
 
-
-def delete_project(stdscr, projects: list,project_index):
+def delete_project(stdscr, projects: list, project_index):
 
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
@@ -120,9 +119,10 @@ def delete_project(stdscr, projects: list,project_index):
     window.clear()
     window.border()
 
-    window.addstr(0,5,"DELETE PROJECT", curses.color_pair(
+    window.addstr(0, 5, "DELETE PROJECT", curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
-    window.addstr(2,1,"Delete project '" + projects[project_index].title + "'?")
+    window.addstr(2, 1, "Delete project '" +
+                  projects[project_index].title + "'?")
 
     si = 1
     # highlight the option yes if the selected index = 1, otherwise highlight no
@@ -148,7 +148,8 @@ def delete_project(stdscr, projects: list,project_index):
         if k == 10:
             if si == 1:
                 projects.remove(projects[project_index])
-                
+
+
 def delete_task(stdscr, project, task_index):
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
@@ -157,9 +158,10 @@ def delete_task(stdscr, project, task_index):
     window.clear()
     window.border()
 
-    window.addstr(0,5,"DELETE TASK", curses.color_pair(
+    window.addstr(0, 5, "DELETE TASK", curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
-    window.addstr(2,1,"Delete task '" + project.tasks[task_index].title + "'?")
+    window.addstr(2, 1, "Delete task '" +
+                  project.tasks[task_index].title + "'?")
 
     si = 1
     # highlight the option yes if the selected index = 1, otherwise highlight no
@@ -186,6 +188,7 @@ def delete_task(stdscr, project, task_index):
             if si == 1:
                 project.removeTask(project.tasks[task_index])
     pass
+
 
 def create_project(projects: list, stdscr):
     h, w = stdscr.getmaxyx()
@@ -346,19 +349,6 @@ def draw_instructions(stdscr):
 
 
 def draw_projects(stdscr, projects: list, idx: int, selected_window):
-    # draw line
-    stdscr.vline(0, menu_width, curses.ACS_VLINE, stdscr.getmaxyx()[
-                 0] - 1, curses.color_pair(CYAN_BLACK))
-
-    # draw project title
-    title = "PROJECTS"
-    title_start = menu_width // 2 - len(title) // 2
-    stdscr.attron(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
-    stdscr.addstr(0, 0, " " * (title_start-1))
-    stdscr.addstr(0, title_start-1, title)
-    stdscr.addstr(0, len(title) + title_start - 1, " " *
-                  (menu_width - (len(title) + title_start)+1))
-    stdscr.attroff(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
 
     # draw projects
     y = 1
@@ -376,20 +366,7 @@ def draw_projects(stdscr, projects: list, idx: int, selected_window):
 def draw_tasks(stdscr, tasks, selected_window, idx):
     h, w = stdscr.getmaxyx()
 
-    # draw middle devidor line
-    stdscr.vline(0, w // 2, curses.ACS_VLINE, h -
-                 1, curses.color_pair(CYAN_BLACK))
-
-    # draw tasks title
-    title = "TASKS"
     width = w//2 - menu_width
-    title_start = menu_width + (width//2 - len(title)//2)
-    stdscr.attron(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
-    stdscr.addstr(0, menu_width + 1, " " * (title_start - menu_width))
-    stdscr.addstr(0, title_start, title)
-    stdscr.addstr(0, title_start + len(title), " " *
-                  (w//2 - (title_start + len(title))))
-    stdscr.attroff(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
 
     # draw task names
     y = 1
@@ -405,29 +382,6 @@ def draw_tasks(stdscr, tasks, selected_window, idx):
                           len(task.status.name), task.status.name)
         stdscr.attroff(curses.color_pair(statuses[task.status.value]))
         y = y + 1
-
-    # draw color instructions
-    legend = "LEGEND"
-    instructions_start = h - controls_lines-1
-    stdscr.hline(instructions_start, menu_width+1, curses.ACS_HLINE,
-                 width//2-len(legend)//2-1, curses.color_pair(MAGENTA_BLACK))
-    stdscr.addstr(instructions_start, menu_width + width // 2 -
-                  len(legend)//2, legend, curses.color_pair(WHITE_MAGENTA))
-    stdscr.hline(instructions_start, menu_width+width//2+len(legend)//2,
-                 curses.ACS_HLINE, width//2 - len(legend)//2, curses.color_pair(MAGENTA_BLACK))
-
-    stdscr.addstr(instructions_start + 1, menu_width + 1,
-                  " " * 3, curses.color_pair(STATUS_DONE))
-    stdscr.addstr(instructions_start + 1, menu_width + 4 + width -
-                  2*len("DONE"), "DONE", curses.color_pair(STATUS_DONE))
-    stdscr.addstr(instructions_start + 2, menu_width + 1,
-                  " " * 3, curses.color_pair(STATUS_IDLE))
-    stdscr.addstr(instructions_start + 2, menu_width + 4 + width -
-                  2*len("IDLE"), "IDLE", curses.color_pair(STATUS_IDLE))
-    stdscr.addstr(instructions_start + 3, menu_width + 1,
-                  " " * 3, curses.color_pair(STATUS_WORKING))
-    stdscr.addstr(instructions_start + 3, menu_width + 4 + width -
-                  int(1.5*len("WORKING")+1), "WORKING", curses.color_pair(STATUS_WORKING))
 
 
 def draw_description(projects, stdscr, task, selected_window):
@@ -491,6 +445,76 @@ def draw_description(projects, stdscr, task, selected_window):
         save(projects)
 
 
+def draw_layout(stdscr):
+    h, w = stdscr.getmaxyx()
+
+    # draw botton text
+    stdscr.addstr(stdscr.getmaxyx()[0] - 1,
+                  0, "TPM by Sem van der Hoeven",)
+
+    # DRAW PROJECTS
+    stdscr.vline(0, menu_width, curses.ACS_VLINE, stdscr.getmaxyx()[
+                 0] - 1, curses.color_pair(CYAN_BLACK))
+
+    # draw project title
+    title = "PROJECTS"
+    title_start = menu_width // 2 - len(title) // 2
+    stdscr.attron(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
+    stdscr.addstr(0, 0, " " * (title_start-1))
+    stdscr.addstr(0, title_start-1, title)
+    stdscr.addstr(0, len(title) + title_start - 1, " " *
+                  (menu_width - (len(title) + title_start)+1))
+    stdscr.attroff(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
+
+    # DRAW TASKS
+    stdscr.vline(0, w // 2, curses.ACS_VLINE, h -
+                 1, curses.color_pair(CYAN_BLACK))
+
+    # draw tasks title
+    title = "TASKS"
+    width = w//2 - menu_width
+    title_start = menu_width + (width//2 - len(title)//2)
+    stdscr.attron(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
+    stdscr.addstr(0, menu_width + 1, " " * (title_start - menu_width))
+    stdscr.addstr(0, title_start, title)
+    stdscr.addstr(0, title_start + len(title), " " *
+                  (w//2 - (title_start + len(title))))
+    stdscr.attroff(curses.color_pair(YELLOW_BLACK) | curses.A_REVERSE)
+
+    # draw color instructions
+    legend = "LEGEND"
+    instructions_start = h - controls_lines-1
+    stdscr.hline(instructions_start, menu_width+1, curses.ACS_HLINE,
+                 width//2-len(legend)//2-1, curses.color_pair(MAGENTA_BLACK))
+    stdscr.addstr(instructions_start, menu_width + width // 2 -
+                  len(legend)//2, legend, curses.color_pair(WHITE_MAGENTA))
+    stdscr.hline(instructions_start, menu_width+width//2+len(legend)//2,
+                 curses.ACS_HLINE, width//2 - len(legend)//2, curses.color_pair(MAGENTA_BLACK))
+
+    stdscr.addstr(instructions_start + 1, menu_width + 1,
+                  " " * 3, curses.color_pair(STATUS_DONE))
+    stdscr.addstr(instructions_start + 1, menu_width + 4 + width -
+                  2*len("DONE"), "DONE", curses.color_pair(STATUS_DONE))
+    stdscr.addstr(instructions_start + 2, menu_width + 1,
+                  " " * 3, curses.color_pair(STATUS_IDLE))
+    stdscr.addstr(instructions_start + 2, menu_width + 4 + width -
+                  2*len("IDLE"), "IDLE", curses.color_pair(STATUS_IDLE))
+    stdscr.addstr(instructions_start + 3, menu_width + 1,
+                  " " * 3, curses.color_pair(STATUS_WORKING))
+    stdscr.addstr(instructions_start + 3, menu_width + 4 + width -
+                  int(1.5*len("WORKING")+1), "WORKING", curses.color_pair(STATUS_WORKING))
+
+def draw_sections(stdscr, projects: list, project_index: int,task_index: int,selected_window: int):
+    draw_layout(stdscr)
+
+    draw_projects(stdscr, projects, project_index, selected_window)
+    draw_tasks(stdscr, projects[project_index].tasks,
+                   selected_window, task_index)
+    draw_instructions(stdscr)
+    draw_description(
+            projects, stdscr, projects[project_index].tasks[task_index], selected_window)
+
+
 def main(stdscr):
     global editing
 
@@ -515,8 +539,6 @@ def main(stdscr):
     newt = False  # making new task
 
     while (k != ord('q')):
-        
-        
 
         if k == curses.KEY_ENTER or k == 10:  # enter key
             if SelectedWindow(selected_window) == SelectedWindow.TASKS:
@@ -575,7 +597,7 @@ def main(stdscr):
             newp = True
         elif (k == ord('t') or k == 116) and not newt:  # t key
             newt = True
-        
+
         elif k == 330:  # delete key
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 delete_project(stdscr, projects, project_index)
@@ -583,45 +605,22 @@ def main(stdscr):
             elif SelectedWindow(selected_window) == SelectedWindow.TASKS:
                 delete_task(stdscr, projects[project_index], task_index)
                 task_index = 0
-            
-
 
         stdscr.clear()
 
-        # draw botton text
-        stdscr.addstr(stdscr.getmaxyx()[0] - 1,
-                      0, "TPM by Sem van der Hoeven",)
-
-        draw_projects(stdscr, projects, project_index, selected_window)
-        draw_tasks(stdscr, projects[project_index].tasks,
-                   selected_window, task_index)
-        draw_instructions(stdscr)
-        draw_description(
-            projects, stdscr, projects[project_index].tasks[task_index], selected_window)
+        draw_sections(stdscr,projects,project_index,task_index,selected_window)
 
         if newp:
             create_project(projects, stdscr)
             newp = False
 
-            # TODO clean
-            draw_projects(stdscr, projects, project_index, selected_window)
-            draw_tasks(stdscr, projects[project_index].tasks,
-                       selected_window, task_index)
-            draw_instructions(stdscr)
-            draw_description(
-                projects, stdscr, projects[project_index].tasks[task_index], selected_window)
+            draw_sections(stdscr,projects,project_index,task_index,selected_window)
 
         if newt:
             create_task(projects[project_index], stdscr)
             newt = False
 
-            # TODO clean
-            draw_projects(stdscr, projects, project_index, selected_window)
-            draw_tasks(stdscr, projects[project_index].tasks,
-                       selected_window, task_index)
-            draw_instructions(stdscr)
-            draw_description(
-                projects, stdscr, projects[project_index].tasks[task_index], selected_window)
+            draw_sections(stdscr,projects,project_index,task_index,selected_window)
 
         k = stdscr.getch()
         stdscr.refresh()
