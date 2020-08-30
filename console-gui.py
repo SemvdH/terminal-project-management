@@ -19,7 +19,7 @@ WHITE_CYAN = 11
 FILENAME = "data"
 
 menu_width = 27
-controls_lines = 5
+controls_lines = 8
 editing = False
 
 
@@ -200,9 +200,9 @@ def create_project(projects: list, stdscr):
                   2, "Enter to confirm")
     lnstr = len("project name:")
 
-    scr2 = curses.newwin(1, 47 - lnstr, window_y + 2, w // 2 - 23 + lnstr)
+    scr2 = curses.newwin(1, menu_width, window_y + 2, w // 2 - 23 + lnstr)
     scr2.clear()
-    window.hline(3, lnstr + 1, curses.ACS_HLINE, 48 - lnstr)
+    window.hline(3, lnstr + 1, curses.ACS_HLINE, menu_width)
 
     window.refresh()
 
@@ -254,23 +254,28 @@ def create_project(projects: list, stdscr):
 def create_task(project, stdscr):
     # TODO create task add window when add project window is made
 
+    window_width = 60
+
     h, w = stdscr.getmaxyx()
     window_y = h // 2 - 3
-    window_x = w//2 - 25
-    window = curses.newwin(7, 50, window_y, window_x)
+    window_x = w // 2 - window_width // 2
+    
+    allowed_width = w//2 - menu_width
+    
+    window = curses.newwin(7, window_width, window_y, window_x)
     window.clear()
     window.border()
 
     window.addstr(0, 5, "ADD TASK", curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
     window.addstr(2, 1, "Task name:", curses.A_REVERSE)
-    window.addstr(4, 25 - len("Enter to confirm") //
+    window.addstr(4, window_width//2 - len("Enter to confirm") //
                   2, "Enter to confirm")
     lnstr = len("Task name:")
 
-    scr2 = curses.newwin(1, 47 - lnstr, window_y + 2, w // 2 - 23 + lnstr)
+    scr2 = curses.newwin(1, window_width-4 - lnstr, window_y + 2, w // 2 - (window_width//2-2) + lnstr)
     scr2.clear()
-    window.hline(3, lnstr + 1, curses.ACS_HLINE, 48 - lnstr)
+    window.hline(3, lnstr + 1, curses.ACS_HLINE, window_width-2 - lnstr)
 
     window.refresh()
 
@@ -278,15 +283,15 @@ def create_task(project, stdscr):
     task_name = textpad.edit()
     task_name = task_name[:-1]
     # clear the "ctrl g to stop editing" message
-    window.addstr(4, 1, " " * 48)
+    window.addstr(4, 1, " " * (window_width-2))
 
-    text = "Add Task: '" + task_name + "'?"
-    window.addstr(4, 25 - len(text) // 2, text)
+    text = "Add Task: '" + task_name + "' to " + project.title + "?"
+    window.addstr(4, window_width//2 - len(text) // 2, text)
     si = 1
 
     # highlight the option yes if the selected index = 1, otherwise highlight no
-    window.addstr(5, 10, "YES", (2097152 << 1) >> (si == 1))
-    window.addstr(5, 35, "NO", (2097152 << 1) >> (si != 1))
+    window.addstr(5, window_width//2 - 10, "YES", (2097152 << 1) >> (si == 1))
+    window.addstr(5, window_width//2 + 10, "NO", (2097152 << 1) >> (si != 1))
 
     k = 0
     while (k != 10):
@@ -298,8 +303,8 @@ def create_task(project, stdscr):
             si = 1 if si == 2 else 2
 
         # highlight the option yes if the selected index = 1, otherwise highlight no
-        window.addstr(5, 10, "YES", (2097152 << 1) >> (si == 1))
-        window.addstr(5, 35, "NO", (2097152 << 1) >> (si != 1))
+        window.addstr(5, window_width//2 - 10, "YES", (2097152 << 1) >> (si == 1))
+        window.addstr(5, window_width//2 + 10, "NO", (2097152 << 1) >> (si != 1))
 
         window.refresh()
         scr2.refresh()
@@ -334,9 +339,14 @@ def draw_instructions(stdscr):
                   2, controls, curses.color_pair(WHITE_MAGENTA))
     stdscr.hline(instructions_start, menu_width//2+len(controls)//2, curses.ACS_HLINE,
                  menu_width//2-len(controls)//2+1, curses.color_pair(MAGENTA_BLACK))
-    stdscr.addstr(instructions_start + 1, 0, "UP/DOWN - move selection")
-    stdscr.addstr(instructions_start + 2, 0, "LEFT/RIGHT - switch section")
-    stdscr.addstr(instructions_start + 3, 0, "SPACE - change task status")
+    stdscr.addstr(instructions_start + 1, 0, "UP/DOWN - Move selection")
+    stdscr.addstr(instructions_start + 2, 0, "LEFT/RIGHT - Switch section")
+    stdscr.addstr(instructions_start + 3, 0, "SPACE - Change task status")
+    stdscr.addstr(instructions_start + 4, 0, "p - Add new project")
+    stdscr.addstr(instructions_start + 5, 0,"t - Add new task to project")
+    stdscr.addstr(instructions_start + 6, 0,"DEL - Delete selected item")
+    stdscr.addstr(instructions_start + 7, 0,"q - Quit")
+
 
 
 def draw_projects(stdscr, projects: list, idx: int, selected_window):
