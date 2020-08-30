@@ -73,18 +73,15 @@ class Status(Enum):
     NONE = 3
 
     def prev(self):
-        print("previous of {}".format(self))
         v = self.value - 1
         if v < 0:
             v = 3
-        print("previous is {}".format(Status(v)))
         return Status(v)
 
     def next(self):
         v = self.value + 1
         if v > 3:
             v = 0
-        print("next is {}".format(Status(v)))
         return Status(v)
 
 
