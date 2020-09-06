@@ -143,6 +143,7 @@ def delete_project(stdscr, projects: list, project_index):
         if k == 10:
             if si == 1:
                 projects.remove(projects[project_index])
+    save(projects)
 
 
 def delete_task(stdscr, project, task_index):
@@ -182,7 +183,8 @@ def delete_task(stdscr, project, task_index):
         if k == 10:
             if si == 1:
                 project.removeTask(project.tasks[task_index])
-    pass
+    
+    
 
 
 def create_project(projects: list, stdscr):
@@ -249,10 +251,11 @@ def create_project(projects: list, stdscr):
     stdscr.refresh()
     del scr2
     del window
+    save(projects)
 
-
-def create_task(project, stdscr):
+def create_task(projects: list,project_index: int, stdscr):
     h, w = stdscr.getmaxyx()
+    project = projects[project_index]
 
     allowed_width = w // 2 - menu_width
     window_width = allowed_width + len("Task name:") + 3
@@ -286,9 +289,12 @@ def create_task(project, stdscr):
     window.addstr(4, 1, " " * (window_width-2))
 
     text = "Add Task: '" + task_name + "' to " + project.title + "?"
-    print(window_width)
-    print(len(text))
-    # window.addstr(4, window_width//2 - len(text) // 2, text)
+    # print(window_width)
+    # print(len(text))
+    if len(text) > window_width:
+        window.addstr(4,0, text)
+    else:
+        window.addstr(4, window_width//2 - len(text) // 2, text)
     si = 1
 
     # highlight the option yes if the selected index = 1, otherwise highlight no
@@ -324,6 +330,8 @@ def create_task(project, stdscr):
     stdscr.refresh()
     del scr2
     del window
+    save(projects)
+    
 
 def rename_project(projects: list, stdscr, project_index: int):
     h, w = stdscr.getmaxyx()
@@ -389,6 +397,7 @@ def rename_project(projects: list, stdscr, project_index: int):
     stdscr.refresh()
     del scr2
     del window
+    save(projects)
 
 def rename_task(projects: list, stdscr, project_index: int, task_index: int):
     h, w = stdscr.getmaxyx()
@@ -454,6 +463,7 @@ def rename_task(projects: list, stdscr, project_index: int, task_index: int):
     stdscr.refresh()
     del scr2
     del window
+    save(projects)
     
 
 
@@ -774,15 +784,19 @@ def main(stdscr):
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 delete_project(stdscr, projects, project_index)
                 project_index = 0
+                
             elif SelectedWindow(selected_window) == SelectedWindow.TASKS and len(projects[project_index].tasks) != 0:
                 delete_task(stdscr, projects[project_index], task_index)
                 if len(projects[project_index].tasks) == 0: selected_window = 1
                 task_index = 0
+                save(projects)
+            
         elif k == 114 and has_projects: # r key
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 rename_project(projects,stdscr,project_index)
             elif SelectedWindow(selected_window) == SelectedWindow.TASKS: 
-                rename_task(projects,stdscr,project_index,task_index)
+                rename_task(projects, stdscr, project_index, task_index)
+            
         stdscr.clear()
 
         draw_sections(stdscr,projects,project_index,task_index,selected_window)
@@ -793,9 +807,8 @@ def main(stdscr):
             draw_sections(stdscr, projects, project_index, task_index, selected_window)
 
         if newt:
-            create_task(projects[project_index], stdscr)
+            create_task(projects, project_index, stdscr)
             newt = False
-
             draw_sections(stdscr,projects,project_index,task_index,selected_window)
 
         k = stdscr.getch()
