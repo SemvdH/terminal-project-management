@@ -198,8 +198,8 @@ def create_project(projects: list, stdscr):
     window.addstr(0, 5, "ADD PROJECT", curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
     window.addstr(2, 1, "Project name:", curses.A_REVERSE)
-    window.addstr(4, 25 - len("Enter to confirm") //
-                  2, "Enter to confirm")
+    window.addstr(4, 25 - len("Press Enter to confirm") //
+                  2, "Press Enter to confirm")
     lnstr = len("project name:")
 
     scr2 = curses.newwin(1, menu_width, window_y + 2, w // 2 - 23 + lnstr)
@@ -271,8 +271,8 @@ def create_task(projects: list,project_index: int, stdscr):
     window.addstr(0, 5, "ADD TASK", curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
     window.addstr(2, 1, "Task name:", curses.A_REVERSE)
-    window.addstr(4, window_width//2 - len("Enter to confirm") //
-                  2, "Enter to confirm")
+    window.addstr(4, window_width//2 - len("Press Enter to confirm") //
+                  2, "Press Enter to confirm")
     lnstr = len("Task name:")
 
     scr2 = curses.newwin(1, allowed_width, window_y + 2, w // 2 - (window_width//2-2) + lnstr)
@@ -342,8 +342,8 @@ def rename_project(projects: list, stdscr, project_index: int):
     window.addstr(0, 5, "RENAME TASK " + projects[project_index].title, curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
     window.addstr(2, 1, "new project name:", curses.A_REVERSE)
-    window.addstr(4, 25 - len("Enter to confirm") //
-                  2, "Enter to confirm")
+    window.addstr(4, 25 - len("Press Enter to confirm") //
+                  2, "Press Enter to confirm")
     lnstr = len("new project name:")
 
     scr2 = curses.newwin(1, menu_width, window_y + 2, w // 2 - 23 + lnstr)
@@ -408,8 +408,8 @@ def rename_task(projects: list, stdscr, project_index: int, task_index: int):
     window.addstr(0, 5, "RENAME TASK " + projects[project_index].tasks[task_index].title, curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
     window.addstr(2, 1, "new task name:", curses.A_REVERSE)
-    window.addstr(4, 25 - len("Enter to confirm") //
-                  2, "Enter to confirm")
+    window.addstr(4, 25 - len("Press Enter to confirm") //
+                  2, "Press Enter to confirm")
     lnstr = len("new task name:")
 
     scr2 = curses.newwin(1, menu_width, window_y + 2, w // 2 - 23 + lnstr)
