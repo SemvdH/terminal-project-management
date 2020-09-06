@@ -9,6 +9,7 @@ by Sem van der Hoeven
 - [Installation](#Installation)
 - [Usage](#Usage)
 - [Features to be added](#Features-to-be-added)
+- [How to contribute](#How-to-contribute)
 
 # Overview
 This is a project management tool straight from your terminal!
@@ -52,3 +53,6 @@ All tasks also have a description which can be edited. You can begin editing a t
 - Custom task colors
 - Project-specific color themes
 - Exporting of project to text file
+
+# How to contribute
+If you would like to contribute to this project, you can fork it and make a pull request with the changes you would like to have added.
