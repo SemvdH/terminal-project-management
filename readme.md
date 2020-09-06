@@ -38,3 +38,5 @@ The application is navigated using the arrow keys and certain shortcut keys. The
  - t - adds a new task to the currently selected project
  - r - rename selected project or task
  - q - exit the application
+
+All tasks also have a description which can be edited. You can begin editing a task's description by selecting it and pressing the enter key. When you're done editing, press ctrl + G to stop editing. The application automatically saves your changes to the `data` file.
