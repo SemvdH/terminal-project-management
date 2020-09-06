@@ -333,9 +333,9 @@ def rename_project(projects: list, stdscr, project_index: int):
     window.clear()
     window.border()
 
-    window.addstr(0, 5, "RENAME PROJECT " + projects[project_index].title, curses.color_pair(
+    window.addstr(0, 5, "RENAME TASK " + projects[project_index].title, curses.color_pair(
         YELLOW_BLACK) | curses.A_REVERSE)
-    window.addstr(2, 1, "new Project name:", curses.A_REVERSE)
+    window.addstr(2, 1, "new project name:", curses.A_REVERSE)
     window.addstr(4, 25 - len("Enter to confirm") //
                   2, "Enter to confirm")
     lnstr = len("new project name:")
@@ -391,7 +391,69 @@ def rename_project(projects: list, stdscr, project_index: int):
     del window
 
 def rename_task(projects: list, stdscr, project_index: int, task_index: int):
-    pass
+    h, w = stdscr.getmaxyx()
+    window_y = h // 2 - 3
+    window_x = w//2 - 25
+    window = curses.newwin(7, 50, window_y, window_x)
+    window.clear()
+    window.border()
+
+    window.addstr(0, 5, "RENAME TASK " + projects[project_index].tasks[task_index].title, curses.color_pair(
+        YELLOW_BLACK) | curses.A_REVERSE)
+    window.addstr(2, 1, "new task name:", curses.A_REVERSE)
+    window.addstr(4, 25 - len("Enter to confirm") //
+                  2, "Enter to confirm")
+    lnstr = len("new task name:")
+
+    scr2 = curses.newwin(1, menu_width, window_y + 2, w // 2 - 23 + lnstr)
+    scr2.clear()
+    window.hline(3, lnstr + 1, curses.ACS_HLINE, menu_width)
+
+    window.refresh()
+
+    textpad = Textbox(scr2, insert_mode=True)
+    task_name = textpad.edit()
+    task_name = task_name[:-1]
+    # clear the "ctrl g to stop editing" message
+    window.addstr(4, 1, " " * 48)
+
+    text = "Rename to: '" + task_name + "'?"
+    window.addstr(4, 25 - len(text) // 2, text)
+    si = 1
+
+    # highlight the option yes if the selected index = 1, otherwise highlight no
+    window.addstr(5, 10, "YES", (2097152 << 1) >> (si == 1))
+    window.addstr(5, 35, "NO", (2097152 << 1) >> (si != 1))
+
+    k = 0
+    while (k != 10):
+
+        if k == curses.KEY_RIGHT or k == 454:
+            si = 2 if si == 1 else 1
+
+        elif k == curses.KEY_LEFT or k == 452:
+            si = 1 if si == 2 else 2
+
+        # highlight the option yes if the selected index = 1, otherwise highlight no
+        window.addstr(5, 10, "YES", (2097152 << 1) >> (si == 1))
+        window.addstr(5, 35, "NO", (2097152 << 1) >> (si != 1))
+
+        window.refresh()
+        scr2.refresh()
+        stdscr.refresh()
+        k = stdscr.getch()
+        if k == 10:
+            if si == 1:
+                # selected yes
+                projects[project_index].tasks[task_index].title = task_name
+
+    window.clear()
+    scr2.clear()
+    scr2.refresh()
+    window.refresh()
+    stdscr.refresh()
+    del scr2
+    del window
     
 
 
@@ -719,7 +781,7 @@ def main(stdscr):
             if SelectedWindow(selected_window) == SelectedWindow.PROJECTS:
                 rename_project(projects,stdscr,project_index)
             elif SelectedWindow(selected_window) == SelectedWindow.TASKS: 
-                pass
+                rename_task(projects,stdscr,project_index,task_index)
         stdscr.clear()
 
         draw_sections(stdscr,projects,project_index,task_index,selected_window)
