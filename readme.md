@@ -18,7 +18,7 @@ It gives a neat presentation of all your projects, which you can assign tasks to
 ### requirements:
 - python 3.x
 
-Download the file from the [releases page](https://github.com/SemvdH/terminal-project-management/releases) and run `python console-gui.py`
+Download the file from the [releases page](https://github.com/SemvdH/terminal-project-management/releases) and run `python tpm.py`
 
 # Usage
 The tool is made to be used in a side window, preferably half the size of your screen, but it works in all 
