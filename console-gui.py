@@ -19,7 +19,7 @@ WHITE_CYAN = 11
 FILENAME = "data"
 
 menu_width = 27
-controls_lines = 8
+controls_lines = 9
 editing = False
 
 
@@ -476,10 +476,11 @@ def draw_instructions(stdscr):
     stdscr.addstr(instructions_start + 1, 0, "UP/DOWN - Move selection")
     stdscr.addstr(instructions_start + 2, 0, "LEFT/RIGHT - Switch section")
     stdscr.addstr(instructions_start + 3, 0, "SPACE - Change task status")
-    stdscr.addstr(instructions_start + 4, 0, "p - Add new project")
-    stdscr.addstr(instructions_start + 5, 0,"t - Add new task to project")
-    stdscr.addstr(instructions_start + 6, 0,"DEL - Delete selected item")
-    stdscr.addstr(instructions_start + 7, 0,"q - Quit")
+    stdscr.addstr(instructions_start + 4, 0, "DEL - Delete selected item")
+    stdscr.addstr(instructions_start + 5, 0, "p - Add new project")
+    stdscr.addstr(instructions_start + 6, 0, "t - Add new task to project")
+    stdscr.addstr(instructions_start + 7, 0, "r - rename selected item")
+    stdscr.addstr(instructions_start + 8, 0, "q - Quit")
 
 
 

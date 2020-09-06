@@ -21,5 +21,20 @@ It gives a neat presentation of all your projects, which you can assign tasks to
 Download the file from the [releases page](https://github.com/SemvdH/terminal-project-management/releases) and run `python console-gui.py`
 
 # Usage
-https://github.com/lukesampson/scoop/wiki/Creating-an-app-manifest
+The tool is made to be used in a side window, preferably half the size of your screen, but it works in all 
+window sizes.
 
+The application is navigated using the arrow keys and certain shortcut keys. The controls are also listed at the bottom of the application:
+![controls image](controls.png)
+     
+ - up / down arrow - move selection
+    - this selects a different project or task
+ - left / right arrow - switch section
+    - this switches between selecting tasks or projects
+ - space - change task status
+    - there are 4 states a task can be in: Done, Idle, Working and no state. By default all newly added tasks are in No state but you can cycle through these using the space bar.
+ - delete key - deletes selected project or task.
+ - p - adds a new project
+ - t - adds a new task to the currently selected project
+ - r - rename selected project or task
+ - q - exit the application
