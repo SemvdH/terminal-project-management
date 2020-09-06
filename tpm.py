@@ -289,8 +289,6 @@ def create_task(projects: list,project_index: int, stdscr):
     window.addstr(4, 1, " " * (window_width-2))
 
     text = "Add Task: '" + task_name + "' to " + project.title + "?"
-    # print(window_width)
-    # print(len(text))
     if len(text) > window_width:
         window.addstr(4,0, text)
     else:
@@ -594,7 +592,6 @@ def draw_description(projects, stdscr, project_index,task_index, selected_window
     if editing and can_edit:
         entered_text = textpad.edit()
         task.desc = entered_text
-        print(task.desc)
         scr2.clear()
         scr2.addstr(0, 0, entered_text)
         scr2.refresh()
