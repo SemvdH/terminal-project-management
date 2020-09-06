@@ -8,6 +8,7 @@ by Sem van der Hoeven
 - [Overview](#Overview)
 - [Installation](#Installation)
 - [Usage](#Usage)
+- [Features to be added](#Features-to-be-added)
 
 # Overview
 This is a project management tool straight from your terminal!
@@ -44,3 +45,10 @@ The application is navigated using the arrow keys and certain shortcut keys. The
 All tasks also have a description which can be edited. You can begin editing a task's description by selecting it and pressing the enter key. When you're done editing, press ctrl + G to stop editing. The application automatically saves your changes to the `data` file.
 
 ![renaming and deleting](img/2.gif)
+
+# Features to be added
+- Color themes
+- Custom task states
+- Custom task colors
+- Project-specific color themes
+- Exporting of project to text file
