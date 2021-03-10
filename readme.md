@@ -21,6 +21,7 @@ It gives a neat presentation of all your projects, which you can assign tasks to
 
 ### requirements:
 - python 3.x
+- curses (install with `pip install windows-curses`)
 
 Download the file from the [releases page](https://github.com/SemvdH/terminal-project-management/releases) and run `python tpm.py`
 

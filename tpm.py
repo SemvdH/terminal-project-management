@@ -281,6 +281,8 @@ def create_task(projects: list,project_index: int, stdscr):
 
     window.refresh()
 
+    
+
     textpad = Textbox(scr2, insert_mode=True)
     task_name = textpad.edit()
     task_name = task_name[:-1]
