@@ -22,7 +22,6 @@ menu_width = 27
 controls_lines = 9
 editing = False
 
-
 STATUS_DONE = WHITE_GREEN
 STATUS_WORKING = WHITE_CYAN
 STATUS_IDLE = WHITE_MAGENTA
