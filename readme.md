@@ -1,3 +1,6 @@
+# Archival
+This project has been migrated to my [Gitea](https://gitty.interesting-corner.nl/sem/terminal-project-management) instance.
+
 # Terminal Project Management
 by Sem van der Hoeven
 
